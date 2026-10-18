@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>校园 AI 信息助手 · 对外经济贸易大学</title>
+<style>
+:root{
+  --line:#e2e9f5; --accent:#2f6bb0; --accent-dark:#24589a;
+  --ink:#16243a; --muted:#5b7089; --soft:#eef3fb;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  background:#f5f8fd; color:var(--ink); font-size:15px; line-height:1.6;
+}
+a{color:var(--accent-dark);text-decoration:none}
+a:hover{text-decoration:underline}
+button{font-family:inherit}
+
+/* ============ 布局 ============ */
+.app{display:flex;min-height:100vh}
+.side{
+  width:238px;flex:0 0 238px;background:#eef3fb;border-right:1px solid var(--line);
+  padding:22px 16px;position:sticky;top:0;height:100vh;overflow:auto;
+}
+.brand{font-size:1.02rem;font-weight:800;color:var(--ink);line-height:1.4;margin-bottom:4px}
+.brand small{display:block;font-weight:500;color:var(--muted);font-size:.76rem;margin-top:2px}
+.nav{margin-top:18px;display:flex;flex-direction:column;gap:4px}
+.nav button{
+  display:flex;align-items:center;gap:9px;width:100%;text-align:left;
+  background:transparent;border:none;border-radius:12px;padding:10px 12px;
+  font-size:.94rem;color:var(--ink);cursor:pointer;transition:.15s;
+}
+.nav button:hover{background:#e2ebf9}
+.nav button.on{background:#2f6bb0;color:#fff;font-weight:600;box-shadow:0 4px 12px rgba(47,107,176,.25)}
+.side-foot{margin-top:22px;padding-top:14px;border-top:1px solid #dbe6f6}
+.who{font-size:.86rem;color:var(--muted);margin-bottom:8px}
+.who b{color:var(--ink)}
+.gen{font-size:.74rem;color:#8fa6c4;margin-top:10px;line-height:1.5}
+.linkbtn{background:#fff;border:1px solid #dbe6f6;border-radius:999px;padding:6px 14px;
+  font-size:.84rem;color:var(--ink);cursor:pointer;width:100%}
+.linkbtn:hover{border-color:var(--accent);color:var(--accent-dark)}
+
+.main{flex:1;min-width:0;max-width:1180px;margin:0 auto;padding:26px 34px 70px}
+.page-title{font-size:1.5rem;font-weight:800;margin:0 0 4px}
+.page-sub{color:var(--muted);font-size:.88rem;margin-bottom:18px}
+
+/* ============ 通用卡片 ============ */
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;
+  box-shadow:0 3px 14px rgba(22,36,58,.06);padding:18px 22px;margin:14px 0}
+.card.tight{padding:14px 18px}
+hr.sep{border:none;border-top:1px solid var(--line);margin:22px 0}
+h3.sec{font-size:1.12rem;margin:20px 0 8px}
+
+/* ============ Hero ============ */
+.hero{background:linear-gradient(120deg,#eef4fd 0%,#e3edfb 55%,#d8e6f8 100%);
+  border:1px solid #dae6f7;border-radius:20px;padding:20px 28px}
+.hero-title{font-size:1.72rem;font-weight:800;line-height:1.3}
+.hero-title em{color:var(--accent-dark);font-style:normal}
+.hero-sub{color:var(--muted);margin-top:4px;font-size:.9rem}
+
+/* ============ 四个分区卡 ============ */
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin:6px 0 4px}
+.tile{background:linear-gradient(180deg,#eef5fe 0%,#e0ecfc 100%);
+  border:1px solid #cddef5;border-radius:18px;padding:20px 18px;min-height:196px;
+  box-shadow:0 4px 16px rgba(47,107,176,.10);display:flex;flex-direction:column;
+  transition:transform .15s,box-shadow .15s}
+.tile:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(47,107,176,.16)}
+.tile-count{font-size:2.2rem;font-weight:800;color:#2f6bb0;line-height:1.1}
+.tile-unit{font-size:.9rem;font-weight:500;color:#7d9cc4;margin-left:3px}
+.tile-title{font-size:1.18rem;font-weight:700;margin-top:4px}
+.tile-hint{color:#7d9cc4;font-size:.84rem;margin-top:auto;padding-top:14px;text-align:center}
+.tile-btn{margin-top:10px;background:#fff;border:1px solid #bcd4f2;border-radius:999px;
+  color:#2f6bb0;font-weight:600;padding:8px 10px;cursor:pointer;font-size:.9rem;width:100%}
+.tile-btn:hover{background:#2f6bb0;color:#fff;border-color:#2f6bb0}
+
+/* ============ 通知卡片 ============ */
+.ncard{background:#fff;border:1px solid var(--line);border-radius:16px;
+  box-shadow:0 3px 12px rgba(22,36,58,.05);padding:16px 20px;margin:12px 0}
+.ncard.read{opacity:.72}
+.ncard h4{margin:6px 0 8px;font-size:1.02rem;line-height:1.5}
+.chip{display:inline-block;font-size:.74rem;font-weight:700;padding:2px 9px;border-radius:999px}
+.chip.key{background:#fdeceb;color:#c0392b}
+.chip.rec{background:#fff4e0;color:#b7791f}
+.chip.normal{background:#eef3fb;color:#5b7089}
+.chip.new{background:#e6f6ec;color:#1f8a4c}
+.meta{color:#8fa6c4;font-size:.82rem;display:flex;flex-wrap:wrap;gap:6px 14px}
+.meta b{color:#5b7089;font-weight:600}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.btn{border:1px solid #dbe6f6;background:#fff;border-radius:999px;padding:6px 14px;
+  font-size:.84rem;color:var(--ink);cursor:pointer;transition:.15s}
+.btn:hover{border-color:var(--accent);color:var(--accent-dark);box-shadow:0 2px 10px rgba(47,107,176,.18)}
+.btn.on{background:#2f6bb0;border-color:#2f6bb0;color:#fff}
+.btn.ghost{background:#f7faff}
+.body{margin-top:12px;padding:12px 14px;background:#f7faff;border:1px solid #e6eefb;
+  border-radius:12px;font-size:.88rem;color:#3b4f68;white-space:pre-wrap;max-height:340px;overflow:auto}
+
+/* ============ 提示条 ============ */
+.info{background:#eef5fe;border:1px solid #d3e3f8;border-radius:14px;padding:12px 16px;
+  color:#3d5a80;font-size:.88rem}
+.warn{background:#fff8e6;border:1px solid #f2e0b0;border-radius:14px;padding:12px 16px;
+  color:#8a6a1f;font-size:.86rem}
+
+/* ============ 日历 ============ */
+.cal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+.cal-month{font-size:1.05rem;font-weight:800}
+.cal-nav{display:flex;gap:8px}
+.cal-nav button{border:1px solid #dbe6f6;background:#fff;border-radius:999px;
+  width:36px;height:32px;cursor:pointer;color:var(--ink);font-size:.9rem}
+.cal-nav button:hover{border-color:var(--accent);color:var(--accent-dark)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:4px}
+.cal-cell{height:62px;border:1px solid #e6ecf6;border-radius:10px;background:#fff;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;font-weight:600;font-size:1rem;line-height:1.15}
+.cal-cell span{font-size:.7em;font-weight:500;min-height:1em;opacity:.9}
+.cal-head-cell{height:auto;border:none;background:transparent;color:#8fa6c4;font-size:.85em}
+.cal-head-cell span{display:none}
+.cal-out{color:#c8d2e0;border-color:#eef2f8}
+.cal-has{background:#dbe7f8;border-color:#cddef5;color:#24589a}
+.cal-today{background:#2f6bb0;border-color:#2f6bb0;color:#fff}
+.cal-today span{color:#fff}
+.dl-group{margin-top:16px}
+.dl-date{font-weight:800;font-size:.95rem}
+.dl-left{color:#2f6bb0;font-weight:600;font-size:.86rem;margin-left:8px}
+.dl-item{padding:6px 0 6px 2px;font-size:.92rem;border-bottom:1px dashed #eef2f8}
+.dl-item:last-child{border-bottom:none}
+.tag{display:inline-block;font-size:.72rem;background:#eef3fb;color:#5b7089;
+  border-radius:6px;padding:1px 7px;margin-left:6px}
+.note{color:#8fa6c4;font-size:.84em}
+
+/* ============ 待办 ============ */
+.form{display:grid;grid-template-columns:1.6fr .9fr;gap:12px}
+.form .full{grid-column:1/-1}
+label.f{display:block;font-size:.82rem;color:var(--muted);margin-bottom:4px}
+input[type=text],input[type=date],input[type=password]{
+  width:100%;border:1px solid #dbe6f6;border-radius:10px;padding:9px 12px;
+  font-size:.92rem;color:var(--ink);background:#fff;outline:none}
+input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(47,107,176,.12)}
+.primary{background:#2f6bb0;color:#fff;border:none;border-radius:999px;padding:10px 22px;
+  font-weight:600;cursor:pointer}
+.primary:hover{background:#24589a}
+.todo{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px dashed #eef2f8}
+.todo:last-child{border-bottom:none}
+.todo .t-title{flex:1;font-weight:600}
+.todo.done .t-title{text-decoration:line-through;color:#9fb0c6;font-weight:500}
+.todo .t-due{font-size:.82rem;color:#8fa6c4}
+.icon{border:none;background:transparent;cursor:pointer;font-size:1rem;color:#8fa6c4;padding:4px 6px}
+.icon:hover{color:var(--accent-dark)}
+.grp{font-weight:800;font-size:.95rem;margin:18px 0 4px;color:#3d5a80}
+
+/* ============ 登录 ============ */
+.login-wrap{max-width:430px;margin:9vh auto 0}
+.login-card{background:#fff;border:1px solid var(--line);border-radius:22px;
+  box-shadow:0 10px 40px rgba(22,36,58,.10);padding:30px 30px 26px}
+.login-card h1{font-size:1.4rem;margin:0 0 4px}
+.login-card p.sub{color:var(--muted);font-size:.86rem;margin:0 0 20px}
+.login-card .field{margin-bottom:12px}
+.login-card .err{color:#c0392b;font-size:.84rem;min-height:1.2em;margin-top:6px}
+.quick{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.quick button{border:1px solid #dbe6f6;background:#f7faff;border-radius:999px;
+  padding:6px 12px;font-size:.82rem;cursor:pointer;color:#3d5a80}
+.quick button:hover{border-color:var(--accent);color:var(--accent-dark)}
+.demo-tip{margin-top:16px;font-size:.8rem;color:#8fa6c4;line-height:1.6}
+
+/* ============ 响应式 ============ */
+@media (max-width:900px){
+  .app{flex-direction:column}
+  .side{width:auto;flex:none;height:auto;position:static;border-right:none;
+    border-bottom:1px solid var(--line);padding:14px}
+  .nav{flex-direction:row;flex-wrap:wrap}
+  .nav button{width:auto;padding:8px 12px}
+  .main{padding:18px 16px 60px}
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .form{grid-template-columns:1fr}
+}
+@media (max-width:520px){
+  body{overflow-x:hidden}
+  .main{padding:14px 12px 56px}
+  .tiles{grid-template-columns:1fr;gap:12px}
+  .tile{min-height:0;padding:16px 16px}
+  .tile-count{font-size:1.8rem}
+  .hero{padding:16px 18px;border-radius:16px}
+  .hero-title{font-size:1.32rem}
+  .card{padding:14px 16px;border-radius:16px}
+  .ncard{padding:14px 14px;border-radius:14px}
+  .ncard h4{font-size:.98rem}
+  .login-wrap{max-width:100%;margin:6vh auto 0;padding:0 4px}
+  .login-card{padding:20px 18px;border-radius:18px}
+  .login-card h1{font-size:1.18rem}
+  .quick button{font-size:.76rem;padding:5px 10px}
+  .side{padding:12px}
+  .nav button{padding:7px 10px;font-size:.86rem}
+  .cal-grid{gap:4px}
+  .cal-cell{height:54px}
+  .form{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<noscript><div style="margin:40px auto;max-width:560px;padding:20px;border:1px solid #f0c2c2;border-radius:12px;background:#fff3f3;font:14px/1.7 sans-serif;color:#8a2b2b">当前环境禁用了 JavaScript，页面无法显示。请用 Chrome / Edge / Safari 浏览器打开本文件。</div></noscript>
+<div class="app">
+  <aside class="side" id="side" style="display:none">
+    <div class="brand">🎓 校园 AI 信息助手<small>对外经济贸易大学</small></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="side-foot">
+      <div class="who" id="who"></div>
+      <button class="linkbtn" data-act="logout">退出登录</button>
+      <div class="gen" id="gen"></div>
+    </div>
+  </aside>
+  <main class="main" id="main"></main>
+</div>
+
+<script>const DATA = {"generated_at": "2026-10-18 13:12", "today": "2026-10-18", "window_days": 7, "users": {"20260001": {"student_no": "20260001", "name": "艺潼", "identity": "硕士研究生", "grade": "研一", "college": "英语学院", "major": "外国语言学及应用语言学", "major_dir": "英语语言文学", "stage": "在读", "interests": ["科研项目", "国际交流", "比赛竞赛"], "goal": ["保研/申博", "提升科研能力"], "preferences": ["所有相关通知", "截止日期提醒", "学术资源"], "custom_keywords": ["CATTI", "口语", "翻译实践", "学术会议"], "block_words": ["招聘会", "监考"], "key": [{"notice_id": "portal_9965110438912000", "score": 87, "level": "重点", "reason": "比赛竞赛是学生关注方向，全校可参加且10月25日前需报名，但AI文生视频与英语专业方向关联较弱，属可参与但非核心的机会。；符合关注方向「比赛竞赛」、有明确截止日期"}, {"notice_id": "portal_10041395622174720", "score": 100, "level": "重点", "reason": "职业规划大赛校内选拔赛属于学生明确关注的比赛竞赛方向，面向硕士生开放且研一可报名，有明确报名截止日期（11-13），需行动报名，与就业生涯发展相关。；符合关注方向「比赛竞赛」、适用对象包含你的身份/年级、有明确截止日期"}], "rec": [{"notice_id": "portal_9683597663133696", "score": 60, "level": "推荐", "reason": "助学金评选面向家庭经济困难硕士生，身份相符但学生关注方向为科研/国际交流/竞赛，未命中其兴趣，且属资助类非发展型机会，相关度一般。；适用对象包含你的身份/年级"}, {"notice_id": "portal_10052423009427456", "score": 77, "level": "推荐", "reason": "奖学金评选面向在读硕士生，身份相符，但学生兴趣为科研项目/国际交流/比赛竞赛，未直接命中奖学金方向，且需学院推荐、竞争性强，属可关注但非核心机会。；适用对象包含你的身份/年级"}], "all": [{"notice_id": "portal_10406429312061440", "score": 35, "level": "普通", "reason": "该通知为讲座回顾报道，学生无需行动；虽与英语学院专业方向相关，但未命中其科研项目、国际交流、比赛竞赛等关注方向，且身份为硕士而通知面向教师和本科生。；活动已于 2025-10-15 结束，无需再行动"}, {"notice_id": "portal_10374726230466560", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "9324c4d80d15be9ea6f5da2bef735809", "score": 40, "level": "普通", "reason": "该通知为外语专业改革讲座的回顾报道，；虽与英语学院专业方向相关，但未命中其科研项目、国际交流、比赛竞赛等关注方向，且属事后回顾类信息，价值有限。；适用对象包含你的身份/年级；活动已于 2026-10-15 结束，无需再行动"}, {"notice_id": "portal_9979206169255936", "score": 41, "level": "普通", "reason": "虽属国际交流类且面向全校，但这是面向墨西哥、巴西孔院学员的体验营开班报道，本校学生无需报名或参与，属于新闻性信息，与学生关注方向仅弱相关。；符合关注方向「国际交流」；活动已于 2026-10-12 结束，无需再行动"}, {"notice_id": "portal_9984598646099968", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10031654622367744", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10031904858738688", "score": 40, "level": "普通", "reason": "该通知为已举办讲座的事后报道，学生无需行动；主题为公共管理实地实验，与学生外国语言学专业及科研项目、国际交流、比赛竞赛等关注方向不吻合。；适用对象包含你的身份/年级；活动已于 2026-10-12 结束，无需再行动"}, {"notice_id": "portal_10041141724176384", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10052860399837184", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10048626707128320", "score": 41, "level": "普通", "reason": "虽属国际交流方向，但为巴西孔院面向当地高校的商务讲座，非本校学生可参与的活动，无行动点，与英语学院研一学生弱相关。；符合关注方向「国际交流」；活动已于 2025-10-15 结束，无需再行动"}, {"notice_id": "portal_10050677520457728", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10069743220023296", "score": 25, "level": "普通", "reason": "校研究生会内部见面会与工作培训，属行政党务类，与学生关注的科研项目、国际交流、比赛竞赛均无关，无需行动。；适用对象包含你的身份/年级；活动已于 2026-10-14 结束，无需再行动"}, {"notice_id": "portal_9947609453813760", "score": 25, "level": "普通", "reason": "答辩与论文提交是研二/研三毕业阶段事务，研一学生当前无需行动，且未命中科研项目、国际交流、比赛竞赛等关注方向。；适用对象包含你的身份/年级"}, {"notice_id": "portal_9948285003796480", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_9683597663133696", "score": 60, "level": "推荐", "reason": "助学金评选面向家庭经济困难硕士生，身份相符但学生关注方向为科研/国际交流/竞赛，未命中其兴趣，且属资助类非发展型机会，相关度一般。；适用对象包含你的身份/年级"}, {"notice_id": "portal_9965110438912000", "score": 87, "level": "重点", "reason": "比赛竞赛是学生关注方向，全校可参加且10月25日前需报名，但AI文生视频与英语专业方向关联较弱，属可参与但非核心的机会。；符合关注方向「比赛竞赛」、有明确截止日期"}, {"notice_id": "portal_9986849365549056", "score": 20, "level": "普通", "reason": "入党积极分子培训属行政党务类通知，与学生关注的科研项目、国际交流、比赛竞赛方向均不相关，且非其发展目标所需。；适用对象包含你的身份/年级"}, {"notice_id": "portal_10024833292951552", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10028058510004224", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10041395622174720", "score": 100, "level": "重点", "reason": "职业规划大赛校内选拔赛属于学生明确关注的比赛竞赛方向，面向硕士生开放且研一可报名，有明确报名截止日期（11-13），需行动报名，与就业生涯发展相关。；符合关注方向「比赛竞赛」、适用对象包含你的身份/年级、有明确截止日期"}, {"notice_id": "portal_10041824137437184", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10052423009427456", "score": 77, "level": "推荐", "reason": "奖学金评选面向在读硕士生，身份相符，但学生兴趣为科研项目/国际交流/比赛竞赛，未直接命中奖学金方向，且需学院推荐、竞争性强，属可关注但非核心机会。；适用对象包含你的身份/年级"}, {"notice_id": "portal_10067009513885696", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10092419685453824", "score": 40, "level": "普通", "reason": "劳动教育实践课程属通识类活动，与学生关注的科研项目、国际交流、比赛竞赛方向均不吻合，仅因需选课报名且截止日期明确而略高于完全不相关。；适用对象包含你的身份/年级"}, {"notice_id": "portal_10109871358119936", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "93983756ae4a777747724b3267f07abb", "score": 15, "level": "普通", "reason": "行政党务类学习研讨通知，与学生关注的科研项目、国际交流、比赛竞赛方向无关，无需个人行动。"}, {"notice_id": "018e04b496b2526708ac0f78c17f7411", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "16268ec7a3739fd551b92cbbb62835c2", "score": 29, "level": "普通", "reason": "港澳台新生见面会属入学教育类活动，仅面向港澳台新生，与英语学院研一学生的科研项目、国际交流、比赛竞赛等关注方向无关，也无需行动。；适用对象包含你的身份/年级、符合研一阶段需求；活动已于 2026-10-15 结束，无需再行动"}, {"notice_id": "aaa03f584aae465d77ad7c536138123c", "score": 25, "level": "普通", "reason": "学位答辩与论文提交面向临近毕业的研二/研三学生，研一学生当前阶段不适用，且未命中科研项目、国际交流、比赛竞赛等关注方向。；适用对象包含你的身份/年级"}, {"notice_id": "portal_9616506128601088", "score": 14, "level": "普通", "reason": "行政党务类红色宣讲事迹报道，与学生关注的科研项目、国际交流、比赛竞赛均无关，且无学生任务。；符合研一阶段需求"}, {"notice_id": "portal_9680360474140672", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_9691003566678016", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10067939399471104", "score": 45, "level": "普通", "reason": "命中「国际交流」关注方向，全校可参与的国际学术交流活动，但属信息性来访交流、无报名或提交等行动要求，且与学生英语专业方向关联较弱。；符合关注方向「国际交流」；活动已于 2026-09-17 结束，无需再行动"}, {"notice_id": "portal_10068257474514944", "score": 41, "level": "普通", "reason": "该论坛为博士生专场且已举行，学生为研一硕士，身份不符且无行动可参与；虽涉及国际交流与学术会议，但仅属事后报道。；符合关注方向「国际交流」；活动已于 2026-09-19 结束，无需再行动"}, {"notice_id": "portal_9590922054197248", "score": 25, "level": "普通", "reason": "该通知面向2026级心理委员开展心理健康MOOC培训，与学生所选科研项目、国际交流、比赛竞赛等关注方向均不吻合，且学生非心理委员，无需行动。；适用对象包含你的身份/年级"}, {"notice_id": "ba21a5d6ad740dee0e49cc0ba8ebe9d5", "score": 30, "level": "普通", "reason": "外语学院保研结果公示，属纯信息性公告，学生为研一硕士且关注科研/国际交流/竞赛，通知无需行动且与其身份阶段不匹配。"}, {"notice_id": "bdf3eb1ad4525eb4239be616542f2836", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "83aced04b6e65589003528035fd0b926", "score": 25, "level": "普通", "reason": "双盲评审结果公布面向即将答辩的博士及同等学力硕士，研一学生尚不涉及学位论文答辩环节，且未命中科研项目、国际交流、比赛竞赛等关注方向。；适用对象包含你的身份/年级"}, {"notice_id": "05f47cdec6c831543f98d8bf97858a78", "score": 15, "level": "普通", "reason": "该通知面向报考者公布硕士统考招生计划，学生为在读研一硕士生，无需再报考，与科研项目、国际交流、比赛竞赛等关注方向均不相关。"}, {"notice_id": "212131789a07ca0aca66a982db96a308", "score": 29, "level": "普通", "reason": "该通知为外语学院新生开学典礼的新闻性活动，学生虽为研一新生但兴趣方向为科研项目、国际交流、比赛竞赛，通知内容与这些方向无关，且无需学生采取任何行动。；适用对象包含你的身份/年级、符合研一阶段需求；活动已于 2026-09-10 结束，无需再行动"}, {"notice_id": "f8c05cf67fdcd29ef204abbb06457942", "score": 42, "level": "普通", "reason": "图书馆数据库使用培训属于工具类培训（按规则≤45），虽与学生学术资源偏好及外文文献需求弱相关，但未命中科研项目/国际交流/比赛竞赛等关注方向，且无需报名行动。；活动已于 2026-10-15 结束，无需再行动"}, {"notice_id": "5fffedbb30bff30cecc1bfdde6028d19", "score": 20, "level": "普通", "reason": "该通知面向2027届预毕业研究生，学生为研一，年级不符且非毕业阶段；内容为毕业图像采集，与其科研项目、国际交流、比赛竞赛等关注方向无关。；适用对象包含你的身份/年级"}, {"notice_id": "3fea89f2f672ad6bb471a2d39aa50a0c", "score": 25, "level": "普通", "reason": "法学院征文获奖名单公示，属结果公告无需行动；学生为英语学院研一，专业方向与兴趣（科研项目/国际交流/比赛竞赛）均未命中，且非其学院活动。；适用对象包含你的身份/年级"}, {"notice_id": "7ec24f416fabdde0e43c28a9e507b008", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_8490918697406464", "score": 55, "level": "普通", "reason": "就业招聘周报虽为可行动清单，但学生关注方向为科研项目/国际交流/比赛竞赛，未命中就业实习，仅属弱相关。"}], "favs": [], "trash": [], "todos": [], "reads": []}, "20260002": {"student_no": "20260002", "name": "XX", "identity": "本科生", "grade": "大一", "college": "国际经济贸易学院", "major": "金融", "major_dir": "国际贸易学", "stage": "入学", "interests": ["科研项目", "国际交流", "学术讲座", "比赛竞赛"], "goal": ["保研/申博", "出国交流", "就业准备"], "preferences": ["所有相关通知", "截止日期提醒"], "custom_keywords": ["创新训练", "学科竞赛", "交换项目", "保研"], "block_words": [], "key": [{"notice_id": "portal_9965110438912000", "score": 97, "level": "重点", "reason": "全校学生可参加的AI文生视频比赛，命中其“比赛竞赛”关注方向，有明确截止日期（10-25），大一新生可报名参与。；符合关注方向「比赛竞赛」、有明确截止日期"}, {"notice_id": "portal_10041395622174720", "score": 100, "level": "重点", "reason": "职业规划大赛属比赛竞赛（命中兴趣），面向本科生可报名，有明确截止日期，且契合就业准备与保研目标，大一新生可借此起步规划。；符合关注方向「比赛竞赛」、适用对象包含你的身份/年级、有明确截止日期"}, {"notice_id": "ba21a5d6ad740dee0e49cc0ba8ebe9d5", "score": 80, "level": "重点", "reason": "命中必看关键词「保研」且与学生保研/申博目标相关，但属于外语学院升学结果公示，学生为金融专业大一，无需行动，仅作参考信息。；命中必看词「保研」"}], "rec": [{"notice_id": "portal_10052423009427456", "score": 77, "level": "推荐", "reason": "奖学金评选面向在读本科生，身份相符，且奖学金类荣誉对保研/申博目标有加分价值；但学生兴趣方向未直接命中奖学金，且大一新生获评“十大杰出学生”难度较大，属可关注但非核心机会。；适用对象包含你的身份/年级"}, {"notice_id": "portal_8490918697406464", "score": 72, "level": "推荐", "reason": "就业实习类周期性汇总，含多场宣讲会/双选会可行动，但学生为大一新生且兴趣方向未直接命中就业实习，属方向相关但非核心的推荐信息。"}], "all": [{"notice_id": "portal_10406429312061440", "score": 45, "level": "普通", "reason": "标题为讲座回顾（事后报道），学生无需行动；虽属学术讲座方向，但内容为外语专业改革，与金融/国际贸易专业关联弱，且为回顾性质，价值有限。；符合关注方向「学术讲座」、适用对象包含你的身份/年级；活动已于 2025-10-15 结束，无需再行动"}, {"notice_id": "portal_10374726230466560", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "9324c4d80d15be9ea6f5da2bef735809", "score": 45, "level": "普通", "reason": "该通知为外语专业改革讲座的事后回顾报道，；虽属学术讲座类，但主题为外语专业改革，与金融/国际贸易学专业方向关联较弱，且为回顾性新闻，价值有限。；符合关注方向「学术讲座」、适用对象包含你的身份/年级；活动已于 2026-10-15 结束，无需再行动"}, {"notice_id": "portal_9979206169255936", "score": 45, "level": "普通", "reason": "属国际交流类新闻，但为孔院体验营开班报道，学生无需行动，且非交换/访学项目，与其出国交流目标关联弱。；符合关注方向「国际交流」；活动已于 2026-10-12 结束，无需再行动"}, {"notice_id": "portal_9984598646099968", "score": 45, "level": "普通", "reason": "校友职业规划讲座命中学术讲座兴趣，且面向本科新生、契合大一入学阶段；但属纯信息性讲座，无需报名行动，方向与就业准备弱相关。；符合关注方向「学术讲座」、适用对象包含你的身份/年级、符合大一阶段需求；活动已于 2026-10-15 结束，无需再行动"}, {"notice_id": "portal_10031654622367744", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10031904858738688", "score": 41, "level": "普通", "reason": "学术讲座虽命中关注方向，但该通知为已举办讲座的事后报道（10-12已过），学生无需行动，且面向教师/研究生，对大一本科生价值有限。；符合关注方向「学术讲座」；活动已于 2026-10-12 结束，无需再行动"}, {"notice_id": "portal_10041141724176384", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10052860399837184", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10048626707128320", "score": 45, "level": "普通", "reason": "虽属国际交流/学术讲座方向，但活动在巴西当地举办、面向巴西高校师生，本校学生无法参与，且活动时间已过，无行动价值。；符合关注方向「国际交流」、「学术讲座」；活动已于 2025-10-15 结束，无需再行动"}, {"notice_id": "portal_10050677520457728", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10069743220023296", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_9947609453813760", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_9948285003796480", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_9683597663133696", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_9965110438912000", "score": 97, "level": "重点", "reason": "全校学生可参加的AI文生视频比赛，命中其“比赛竞赛”关注方向，有明确截止日期（10-25），大一新生可报名参与。；符合关注方向「比赛竞赛」、有明确截止日期"}, {"notice_id": "portal_9986849365549056", "score": 25, "level": "普通", "reason": "入党积极分子培训属行政党务类通知，与学生关注的科研项目、国际交流、学术讲座、比赛竞赛等方向均不相关，且非其发展目标所需行动。；适用对象包含你的身份/年级"}, {"notice_id": "portal_10024833292951552", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10028058510004224", "score": 28, "level": "普通", "reason": "体质健康测试时间调整属教务事务性通知，与学生关注的科研、竞赛、国际交流、学术讲座等方向均不相关，无需主动行动。；适用对象包含你的身份/年级、入学阶段相关"}, {"notice_id": "portal_10041395622174720", "score": 100, "level": "重点", "reason": "职业规划大赛属比赛竞赛（命中兴趣），面向本科生可报名，有明确截止日期，且契合就业准备与保研目标，大一新生可借此起步规划。；符合关注方向「比赛竞赛」、适用对象包含你的身份/年级、有明确截止日期"}, {"notice_id": "portal_10041824137437184", "score": 20, "level": "普通", "reason": "退役士兵国家助学金名单公示，学生非退役士兵且兴趣方向（科研/竞赛/国际交流/讲座）均未命中，属无关公示。；适用对象包含你的身份/年级"}, {"notice_id": "portal_10052423009427456", "score": 77, "level": "推荐", "reason": "奖学金评选面向在读本科生，身份相符，且奖学金类荣誉对保研/申博目标有加分价值；但学生兴趣方向未直接命中奖学金，且大一新生获评“十大杰出学生”难度较大，属可关注但非核心机会。；适用对象包含你的身份/年级"}, {"notice_id": "portal_10067009513885696", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10092419685453824", "score": 43, "level": "普通", "reason": "劳动教育实践课程属通识类活动，与学生关注的科研项目、国际交流、学术讲座、比赛竞赛均不吻合，仅身份相符，行动性弱。；适用对象包含你的身份/年级、入学阶段相关"}, {"notice_id": "portal_10109871358119936", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "93983756ae4a777747724b3267f07abb", "score": 15, "level": "普通", "reason": "行政党务类学习研讨通知，与学生关注的科研、竞赛、国际交流等方向无关，且无需学生行动。"}, {"notice_id": "018e04b496b2526708ac0f78c17f7411", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "16268ec7a3739fd551b92cbbb62835c2", "score": 44, "level": "普通", "reason": "港澳台新生见面会仅面向港澳台籍新生，该生为普通内地大一新生，身份不符且无行动要求，与其科研/竞赛/国际交流等关注方向无关。；适用对象包含你的身份/年级、符合大一阶段需求；活动已于 2026-10-15 结束，无需再行动"}, {"notice_id": "aaa03f584aae465d77ad7c536138123c", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_9616506128601088", "score": 19, "level": "普通", "reason": "行政党务类红色宣讲事迹报道，无学生任务，与学生关注的科研、竞赛、国际交流、学术讲座等方向均不相关。；符合大一阶段需求"}, {"notice_id": "portal_9680360474140672", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_9691003566678016", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10067939399471104", "score": 45, "level": "普通", "reason": "国际交流与学术讲座方向命中，全校可参与且与国际贸易学专业相关，但属来访交流信息性活动、无报名截止等行动要求，故为推荐而非重点。；符合关注方向「国际交流」、「学术讲座」；活动已于 2026-09-17 结束，无需再行动"}, {"notice_id": "portal_10068257474514944", "score": 37, "level": "普通", "reason": "该通知为博士生国际学术论坛的事后报道，面向在读博士生，与大一本科生身份不符，且无报名或参与行动，仅属信息性新闻。；符合关注方向「国际交流」、「学术讲座」；活动已于 2026-09-19 结束，无需再行动"}, {"notice_id": "portal_9590922054197248", "score": 25, "level": "普通", "reason": "该通知仅面向2026级心理委员开展MOOC培训，学生为大一新生且非心理委员，未命中其科研、竞赛、国际交流、学术讲座等关注方向，也无需其行动。；适用对象包含你的身份/年级"}, {"notice_id": "ba21a5d6ad740dee0e49cc0ba8ebe9d5", "score": 80, "level": "重点", "reason": "命中必看关键词「保研」且与学生保研/申博目标相关，但属于外语学院升学结果公示，学生为金融专业大一，无需行动，仅作参考信息。；命中必看词「保研」"}, {"notice_id": "bdf3eb1ad4525eb4239be616542f2836", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "83aced04b6e65589003528035fd0b926", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "05f47cdec6c831543f98d8bf97858a78", "score": 18, "level": "普通", "reason": "该通知面向硕士统考报考者，大一在读本科生无需报考，与科研、竞赛、交换等关注方向无关。；入学阶段相关"}, {"notice_id": "212131789a07ca0aca66a982db96a308", "score": 24, "level": "普通", "reason": "外语学院新生开学典礼，学生为国际经济贸易学院金融专业大一新生，学院不符且非其关注方向（科研/竞赛/国际交流/讲座），属他院活动，无行动价值。；适用对象包含你的身份/年级、符合大一阶段需求；活动已于 2026-09-10 结束，无需再行动"}, {"notice_id": "f8c05cf67fdcd29ef204abbb06457942", "score": 45, "level": "普通", "reason": "图书馆数据库使用培训属于工具类培训（按规则≤45），虽为学术活动但非学术讲座，与学生关注的科研项目/国际交流/竞赛等方向关联弱，且无需报名行动。；符合关注方向「学术讲座」；工具培训类，非个人发展机会；活动已于 2026-10-15 结束，无需再行动"}, {"notice_id": "5fffedbb30bff30cecc1bfdde6028d19", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "3fea89f2f672ad6bb471a2d39aa50a0c", "score": 46, "level": "普通", "reason": "法学院征文获奖名单公示，属纯结果公告，学生无需行动；且为法学院活动，与金融/国际贸易学专业及科研、竞赛等关注方向关联弱。；符合关注方向「学术讲座」、适用对象包含你的身份/年级"}, {"notice_id": "7ec24f416fabdde0e43c28a9e507b008", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_8490918697406464", "score": 72, "level": "推荐", "reason": "就业实习类周期性汇总，含多场宣讲会/双选会可行动，但学生为大一新生且兴趣方向未直接命中就业实习，属方向相关但非核心的推荐信息。"}], "favs": [], "trash": [], "todos": [], "reads": []}, "202209105": {"student_no": "202209105", "name": "艺潼", "identity": "硕士研究生", "grade": "研一", "college": "英语学院", "major": "", "major_dir": "外国语言学及应用语言学", "stage": "在读", "interests": ["科研项目", "国际交流", "学术讲座", "比赛竞赛", "奖学金", "就业实习", "校园活动"], "goal": ["保研/申博"], "preferences": ["所有相关通知", "截止日期提醒"], "custom_keywords": ["创赛", "就业"], "block_words": [], "key": [{"notice_id": "portal_9683597663133696", "score": 99, "level": "重点", "reason": "面向在读硕士生的助学金评选，命中其「奖学金」关注方向，身份相符且需提交申请材料，属可行动的高价值机会。；符合关注方向「奖学金」、适用对象包含你的身份/年级"}, {"notice_id": "portal_9965110438912000", "score": 87, "level": "重点", "reason": "全校学生可参加的AI文生视频比赛，命中其「比赛竞赛」关注方向且有明确截止日期，但主题为诚信教育、与英语专业及申博目标关联较弱，行动性中等。；符合关注方向「比赛竞赛」、有明确截止日期"}, {"notice_id": "portal_10041395622174720", "score": 100, "level": "重点", "reason": "职业规划大赛校内选拔赛，命中比赛竞赛与就业实习关注方向，且custom_keywords含'就业'，需报名行动、11月13日截止，身份年级均相符；命中必看词「就业」、符合关注方向「比赛竞赛」、「就业实习」、适用对象包含你的身份/年级、有明确截止日期"}, {"notice_id": "portal_10052423009427456", "score": 99, "level": "重点", "reason": "十大杰出学生暨金沓奖学金评选，命中其「奖学金」关注方向，身份（硕士生）与年级（研一）均在适用范围内，需经学院申请推荐、有行动性，且对保研/申博目标有加分价值。；符合关注方向「奖学金」、适用对象包含你的身份/年级"}, {"notice_id": "portal_8490918697406464", "score": 100, "level": "重点", "reason": "一周就业招聘与指导安排汇总，命中其'就业实习'关注方向及'就业'必看关键词，含宣讲会/双选会等可直接参加的机会，全校适用且需行动。；命中必看词「就业」、符合关注方向「就业实习」"}], "rec": [], "all": [{"notice_id": "portal_10406429312061440", "score": 45, "level": "普通", "reason": "学术讲座类通知，命中你勾选的“学术讲座”关注方向，且主题为外语类专业改革与逆向设计，与英语学院外国语言学及应用语言学专业方向相关；但属于讲座回顾（事后报道性质），无报名或提交等行动要求，故为推荐而非重点。；符合关注方向「学术讲座」；活动已于 2025-10-15 结束，无需再行动"}, {"notice_id": "portal_10374726230466560", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "9324c4d80d15be9ea6f5da2bef735809", "score": 45, "level": "普通", "reason": "学术讲座类通知，命中其“学术讲座”关注方向，但为已举办讲座的回顾报道，无报名或参与行动，且内容偏外语专业教学改革，对其科研/申博帮助有限。；符合关注方向「学术讲座」、适用对象包含你的身份/年级；活动已于 2026-10-15 结束，无需再行动"}, {"notice_id": "portal_9979206169255936", "score": 45, "level": "普通", "reason": "属国际交流方向但为孔院体验营开班新闻，非面向本校生的交换/访学机会，学生无需行动，仅弱相关。；符合关注方向「国际交流」；活动已于 2026-10-12 结束，无需再行动"}, {"notice_id": "portal_9984598646099968", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10031654622367744", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10031904858738688", "score": 45, "level": "普通", "reason": "学术讲座方向命中，但该讲座已成功举办（10-12已过），且面向政管学院公共管理主题，与英语学院外国语言学专业关联弱，学生无事可做。；符合关注方向「学术讲座」、适用对象包含你的身份/年级；新闻/成果报道，无需行动；活动已于 2026-10-12 结束，无需再行动"}, {"notice_id": "portal_10041141724176384", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10052860399837184", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10048626707128320", "score": 45, "level": "普通", "reason": "属国际交流/学术讲座方向，但活动在巴西当地举办、面向当地高校师生，本校学生无法实际参与，仅作信息参考。；符合关注方向「国际交流」、「学术讲座」；活动已于 2025-10-15 结束，无需再行动"}, {"notice_id": "portal_10050677520457728", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10069743220023296", "score": 25, "level": "普通", "reason": "校研究生会内部见面会与工作培训，属行政党务类，与学生关注的科研、国际交流、学术讲座、竞赛、奖学金、就业等方向均不相关，无需行动。；适用对象包含你的身份/年级；活动已于 2026-10-14 结束，无需再行动"}, {"notice_id": "portal_9947609453813760", "score": 35, "level": "普通", "reason": "通知面向即将答辩的研二/研三及博士生，研一学生尚不涉及答辩与论文提交，属阶段性错位，且未命中其科研项目、国际交流、竞赛等关注方向。；适用对象包含你的身份/年级"}, {"notice_id": "portal_9948285003796480", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_9683597663133696", "score": 99, "level": "重点", "reason": "面向在读硕士生的助学金评选，命中其「奖学金」关注方向，身份相符且需提交申请材料，属可行动的高价值机会。；符合关注方向「奖学金」、适用对象包含你的身份/年级"}, {"notice_id": "portal_9965110438912000", "score": 87, "level": "重点", "reason": "全校学生可参加的AI文生视频比赛，命中其「比赛竞赛」关注方向且有明确截止日期，但主题为诚信教育、与英语专业及申博目标关联较弱，行动性中等。；符合关注方向「比赛竞赛」、有明确截止日期"}, {"notice_id": "portal_9986849365549056", "score": 25, "level": "普通", "reason": "入党积极分子培训属行政党务类通知，与学生关注的科研、国际交流、竞赛、奖学金、就业等方向均不相关，且非其发展目标所需行动。；适用对象包含你的身份/年级"}, {"notice_id": "portal_10024833292951552", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10028058510004224", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10041395622174720", "score": 100, "level": "重点", "reason": "职业规划大赛校内选拔赛，命中比赛竞赛与就业实习关注方向，且custom_keywords含'就业'，需报名行动、11月13日截止，身份年级均相符；命中必看词「就业」、符合关注方向「比赛竞赛」、「就业实习」、适用对象包含你的身份/年级、有明确截止日期"}, {"notice_id": "portal_10041824137437184", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10052423009427456", "score": 99, "level": "重点", "reason": "十大杰出学生暨金沓奖学金评选，命中其「奖学金」关注方向，身份（硕士生）与年级（研一）均在适用范围内，需经学院申请推荐、有行动性，且对保研/申博目标有加分价值。；符合关注方向「奖学金」、适用对象包含你的身份/年级"}, {"notice_id": "portal_10067009513885696", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10092419685453824", "score": 50, "level": "普通", "reason": "劳动教育实践课程属通识类校园活动，与学生关注的科研、竞赛、国际交流、学术讲座等核心方向关联较弱，仅校园活动一项擦边，且无明确发展价值。；适用对象包含你的身份/年级"}, {"notice_id": "portal_10109871358119936", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "93983756ae4a777747724b3267f07abb", "score": 21, "level": "普通", "reason": "行政党务类学习研讨通知，与学生关注的科研、国际交流、竞赛、就业等方向无关，无需个人行动。；符合关注方向「校园活动」"}, {"notice_id": "018e04b496b2526708ac0f78c17f7411", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "16268ec7a3739fd551b92cbbb62835c2", "score": 35, "level": "普通", "reason": "港澳台新生见面会仅面向港澳台籍新生，学生为内地硕士研一，身份不符且无行动需求，与其科研/国际交流/就业等关注方向无关。；符合关注方向「就业实习」、适用对象包含你的身份/年级、符合研一阶段需求；活动已于 2026-10-15 结束，无需再行动"}, {"notice_id": "aaa03f584aae465d77ad7c536138123c", "score": 25, "level": "普通", "reason": "学位答辩与论文提交面向临近毕业的研二/研三学生，研一学生当前阶段不适用，且未命中其科研项目、国际交流、竞赛等关注方向。；适用对象包含你的身份/年级"}, {"notice_id": "portal_9616506128601088", "score": 25, "level": "普通", "reason": "行政党务类红色宣讲事迹报道，无学生任务，与学生关注方向（科研/竞赛/讲座/国际交流等）均不相关。；符合关注方向「就业实习」、符合研一阶段需求"}, {"notice_id": "portal_9680360474140672", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_9691003566678016", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10067939399471104", "score": 45, "level": "普通", "reason": "国际交流与学术讲座方向命中，全校可参与，但为到访交流活动、无报名截止与行动要求，且非学生专业核心方向。；符合关注方向「国际交流」、「学术讲座」；活动已于 2026-09-17 结束，无需再行动"}, {"notice_id": "portal_10068257474514944", "score": 45, "level": "普通", "reason": "该论坛为博士生专场且已顺利举行，属于事后报道，硕士生身份不符且无需行动，仅与学术讲座兴趣弱相关。；符合关注方向「国际交流」、「学术讲座」；活动已于 2026-09-19 结束，无需再行动"}, {"notice_id": "portal_9590922054197248", "score": 25, "level": "普通", "reason": "该通知仅面向2026级心理委员开展MOOC培训，学生为研一英语学院硕士生，身份与角色不符，且未命中其科研、国际交流、竞赛、奖学金、就业等任一关注方向，无需行动。；适用对象包含你的身份/年级"}, {"notice_id": "ba21a5d6ad740dee0e49cc0ba8ebe9d5", "score": 30, "level": "普通", "reason": "外语学院保研结果公示，属纯结果公告，学生为在读硕士无需行动；虽与升学目标沾边，但非本人可参与的保研/申博机会，相关度低。"}, {"notice_id": "bdf3eb1ad4525eb4239be616542f2836", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "83aced04b6e65589003528035fd0b926", "score": 25, "level": "普通", "reason": "双盲评审结果公布面向博士及同等学力硕士，研一学生不涉及学位论文答辩环节，且无行动要求，与其关注方向无关。；适用对象包含你的身份/年级"}, {"notice_id": "05f47cdec6c831543f98d8bf97858a78", "score": 15, "level": "普通", "reason": "该通知面向报考者公布硕士统考招生计划，学生为在读研一硕士生，无需再报考，与科研、国际交流、就业等关注方向均不相关。"}, {"notice_id": "212131789a07ca0aca66a982db96a308", "score": 29, "level": "普通", "reason": "新生开学典礼属入学教育活动，学生为研一在读，且兴趣方向（科研/竞赛/国际交流等）均未命中，无行动要求。；适用对象包含你的身份/年级、符合研一阶段需求；活动已于 2026-09-10 结束，无需再行动"}, {"notice_id": "f8c05cf67fdcd29ef204abbb06457942", "score": 45, "level": "普通", "reason": "图书馆数据库使用培训属工具类培训（按规则≤45），虽与学生学术讲座兴趣擦边，但非学术讲座、无行动要求，且外文文献检索对英语专业科研有一定辅助价值。；符合关注方向「学术讲座」；工具培训类，非个人发展机会；活动已于 2026-10-15 结束，无需再行动"}, {"notice_id": "5fffedbb30bff30cecc1bfdde6028d19", "score": 20, "level": "普通", "reason": "该通知面向2027届预毕业研究生，学生为研一，年级不符且与科研、国际交流、就业等关注方向无关。；适用对象包含你的身份/年级"}, {"notice_id": "3fea89f2f672ad6bb471a2d39aa50a0c", "score": 46, "level": "普通", "reason": "法学院征文获奖名单公示，属纯结果公告，学生无需行动；且为法学院活动，与英语学院外国语言学专业方向不相关，仅学术活动类别擦边。；符合关注方向「学术讲座」、适用对象包含你的身份/年级"}, {"notice_id": "7ec24f416fabdde0e43c28a9e507b008", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_8490918697406464", "score": 100, "level": "重点", "reason": "一周就业招聘与指导安排汇总，命中其'就业实习'关注方向及'就业'必看关键词，含宣讲会/双选会等可直接参加的机会，全校适用且需行动。；命中必看词「就业」、符合关注方向「就业实习」"}], "favs": [{"notice_id": "portal_8490918697406464"}, {"notice_id": "portal_7522493548367872"}, {"notice_id": "portal_7156727772078080"}], "trash": [{"notice_id": "portal_7150401922785280"}, {"notice_id": "portal_7145822500589568"}], "todos": [{"id": "6", "title": "交实习鉴定表给辅导员", "due": "2026-10-14", "note": "记得盖章", "done": true}, {"id": "4", "title": "提交《高级英语》课程论文", "due": "2026-10-15", "note": "需导师签字，带纸质版", "done": true}, {"id": "5", "title": "报名 12 月大学英语四六级考试", "due": "2026-10-18", "note": "", "done": true}, {"id": "7", "title": "语用学pre", "due": "2026-10-28", "note": "", "done": false}], "reads": ["portal_8490918697406464", "portal_7522493548367872", "portal_7156727772078080"]}, "202209106": {"student_no": "202209106", "name": "yt", "identity": "本科生", "grade": "大二", "college": "国际经济贸易学院", "major": "", "major_dir": "金融学", "stage": "在读", "interests": ["科研项目", "国际交流"], "goal": ["保研/申博", "出国交流", "提升科研能力", "提升实践能力", "就业准备"], "preferences": ["所有相关通知", "截止日期提醒"], "custom_keywords": ["创赛"], "block_words": [], "key": [{"notice_id": "portal_10041395622174720", "score": 80, "level": "重点", "reason": "职业规划大赛校内选拔赛面向本科生开放报名，与学生就业准备目标相关，但学生关注方向为科研项目和国际交流，未直接命中，属于方向相关但非核心的推荐类通知。；适用对象包含你的身份/年级、有明确截止日期"}, {"notice_id": "portal_10052423009427456", "score": 83, "level": "重点", "reason": "奖学金评选面向在读本科生，身份相符，且奖学金类荣誉对保研/申博目标有加分价值；但学生兴趣方向为科研项目与国际交流，未直接命中，且通知未明确截止日期，行动性稍弱。；适用对象包含你的身份/年级"}], "rec": [{"notice_id": "portal_8490918697406464", "score": 72, "level": "推荐", "reason": "就业实习类周期性汇总，含多场宣讲会/双选会可行动，但学生兴趣为科研项目与国际交流，未直接命中，属方向相关但非核心的推荐信息。"}], "all": [{"notice_id": "portal_10406429312061440", "score": 35, "level": "普通", "reason": "该通知为外语类专业教学改革讲座的回顾报道，学生为金融学专业大二本科生，关注科研项目与国际交流，方向不吻合且属事后回顾、无需行动。；适用对象包含你的身份/年级；活动已于 2025-10-15 结束，无需再行动"}, {"notice_id": "portal_10374726230466560", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "9324c4d80d15be9ea6f5da2bef735809", "score": 30, "level": "普通", "reason": "该通知为外语专业改革讲座的事后回顾报道，；且学生为金融学专业、关注科研项目与国际交流，方向不吻合。；适用对象包含你的身份/年级；活动已于 2026-10-15 结束，无需再行动"}, {"notice_id": "portal_9979206169255936", "score": 41, "level": "普通", "reason": "虽属国际交流类且学生关注国际交流，但这是面向墨西哥、巴西孔院学员的体验营开班报道，非本校学生可参与的项目，无报名或行动入口，相关度低。；符合关注方向「国际交流」；活动已于 2026-10-12 结束，无需再行动"}, {"notice_id": "portal_9984598646099968", "score": 45, "level": "普通", "reason": "校友职业规划讲座面向本科新生，学生为大二且兴趣为科研项目/国际交流，方向不吻合，属弱相关活动信息。；适用对象包含你的身份/年级、符合大二阶段需求；活动已于 2026-10-15 结束，无需再行动"}, {"notice_id": "portal_10031654622367744", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10031904858738688", "score": 20, "level": "普通", "reason": "该通知为已举办讲座的事后报道，学生无需行动；且面向教师和硕博，与本科生身份不符，也未命中其科研项目或国际交流关注方向。；活动已于 2026-10-12 结束，无需再行动"}, {"notice_id": "portal_10041141724176384", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10052860399837184", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10048626707128320", "score": 41, "level": "普通", "reason": "虽属国际交流方向，但为巴西孔院面向当地高校的商务讲座，非本校学生可参与的活动，且无报名或行动要求，与学生的出国交流/科研需求关联很弱。；符合关注方向「国际交流」；活动已于 2025-10-15 结束，无需再行动"}, {"notice_id": "portal_10050677520457728", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10069743220023296", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_9947609453813760", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_9948285003796480", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_9683597663133696", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_9965110438912000", "score": 58, "level": "普通", "reason": "全校可参加的AI文生视频比赛，但学生关注方向为科研项目与国际交流，未命中比赛竞赛兴趣，且与金融学专业关联弱，属弱相关机会。；有明确截止日期"}, {"notice_id": "portal_9986849365549056", "score": 20, "level": "普通", "reason": "入党积极分子培训属行政党务类通知，与学生关注的科研项目、国际交流方向无关，且不涉及保研/出国等发展目标。；适用对象包含你的身份/年级"}, {"notice_id": "portal_10024833292951552", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10028058510004224", "score": 40, "level": "普通", "reason": "体测时间调整属教务事务性通知，与学生关注的科研项目、国际交流方向无关，仅需按新时间参加，无报名或申报行动。；适用对象包含你的身份/年级"}, {"notice_id": "portal_10041395622174720", "score": 80, "level": "重点", "reason": "职业规划大赛校内选拔赛面向本科生开放报名，与学生就业准备目标相关，但学生关注方向为科研项目和国际交流，未直接命中，属于方向相关但非核心的推荐类通知。；适用对象包含你的身份/年级、有明确截止日期"}, {"notice_id": "portal_10041824137437184", "score": 25, "level": "普通", "reason": "退役士兵国家助学金名单公示，仅面向退役士兵本科生，与学生身份不符，且属结果公示无需行动，未命中科研项目/国际交流等关注方向。；适用对象包含你的身份/年级"}, {"notice_id": "portal_10052423009427456", "score": 83, "level": "重点", "reason": "奖学金评选面向在读本科生，身份相符，且奖学金类荣誉对保研/申博目标有加分价值；但学生兴趣方向为科研项目与国际交流，未直接命中，且通知未明确截止日期，行动性稍弱。；适用对象包含你的身份/年级"}, {"notice_id": "portal_10067009513885696", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10092419685453824", "score": 40, "level": "普通", "reason": "劳动教育实践课程属通识实践类，与学生关注的科研项目、国际交流方向不吻合，且非其核心发展目标，仅作一般信息参考。；适用对象包含你的身份/年级"}, {"notice_id": "portal_10109871358119936", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "93983756ae4a777747724b3267f07abb", "score": 15, "level": "普通", "reason": "行政党务类学习研讨通知，与学生关注的科研项目、国际交流方向无关，且非其学院活动，无需行动。"}, {"notice_id": "018e04b496b2526708ac0f78c17f7411", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "16268ec7a3739fd551b92cbbb62835c2", "score": 29, "level": "普通", "reason": "港澳台新生见面会仅面向港澳台新生，该生为大陆大二本科生，身份不符且无行动需求，与科研项目、国际交流等关注方向无关。；适用对象包含你的身份/年级、符合大二阶段需求；活动已于 2026-10-15 结束，无需再行动"}, {"notice_id": "aaa03f584aae465d77ad7c536138123c", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_9616506128601088", "score": 14, "level": "普通", "reason": "行政党务类红色宣讲事迹报道，与学生关注的科研项目、国际交流方向无关，且无学生任务可行动。；符合大二阶段需求"}, {"notice_id": "portal_9680360474140672", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_9691003566678016", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10067939399471104", "score": 45, "level": "普通", "reason": "命中你关注的国际交流方向，全校可参与，但属学术交流活动信息、无报名截止等行动要求，且非你金融专业对口，故为推荐而非重点。；符合关注方向「国际交流」；活动已于 2026-09-17 结束，无需再行动"}, {"notice_id": "portal_10068257474514944", "score": 31, "level": "普通", "reason": "该论坛面向在读博士生和教师，本科生不在适用范围内，且为已举行的事后报道，学生无需行动；虽涉及国际交流方向，但身份不符。；符合关注方向「国际交流」；活动已于 2026-09-19 结束，无需再行动"}, {"notice_id": "portal_9590922054197248", "score": 25, "level": "普通", "reason": "该通知仅面向2026级心理委员开展心理健康MOOC培训，与学生的大二身份、金融学专业及科研项目/国际交流等关注方向均不相关，无需行动。；适用对象包含你的身份/年级"}, {"notice_id": "ba21a5d6ad740dee0e49cc0ba8ebe9d5", "score": 35, "level": "普通", "reason": "外语学院保研结果公示，属他院升学成绩报道，学生为经贸学院大二且关注科研/国际交流，无需行动，仅弱相关。"}, {"notice_id": "bdf3eb1ad4525eb4239be616542f2836", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "83aced04b6e65589003528035fd0b926", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "05f47cdec6c831543f98d8bf97858a78", "score": 20, "level": "普通", "reason": "该通知面向硕士统考报考者，学生为在读大二本科生，无需报考，与科研项目、国际交流等关注方向无关。"}, {"notice_id": "212131789a07ca0aca66a982db96a308", "score": 24, "level": "普通", "reason": "外语学院新生开学典礼，面向2026级新生，与国贸学院大二学生身份不符，且不涉及科研项目或国际交流等关注方向，无需行动。；适用对象包含你的身份/年级、符合大二阶段需求；活动已于 2026-09-10 结束，无需再行动"}, {"notice_id": "f8c05cf67fdcd29ef204abbb06457942", "score": 35, "level": "普通", "reason": "图书馆数据库使用培训属于工具类日常培训，非学术讲座或科研机会，与学生关注的科研项目、国际交流方向关联弱，且无需报名行动。；活动已于 2026-10-15 结束，无需再行动"}, {"notice_id": "5fffedbb30bff30cecc1bfdde6028d19", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "3fea89f2f672ad6bb471a2d39aa50a0c", "score": 35, "level": "普通", "reason": "法学院征文获奖名单公示，属结果公告，学生无需行动；且学生为经贸学院金融学专业，兴趣为科研项目与国际交流，未命中关注方向。；适用对象包含你的身份/年级"}, {"notice_id": "7ec24f416fabdde0e43c28a9e507b008", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_8490918697406464", "score": 72, "level": "推荐", "reason": "就业实习类周期性汇总，含多场宣讲会/双选会可行动，但学生兴趣为科研项目与国际交流，未直接命中，属方向相关但非核心的推荐信息。"}], "favs": [], "trash": [], "todos": [], "reads": []}, "202610621687": {"student_no": "202610621687", "name": "11", "identity": "本科生", "grade": "大二", "college": "国际经济贸易学院", "major": "", "major_dir": "金融学", "stage": "在读", "interests": ["科研项目", "国际交流"], "goal": ["保研/申博", "提升实践能力"], "preferences": ["所有相关通知", "截止日期提醒"], "custom_keywords": ["创赛"], "block_words": [], "key": [{"notice_id": "portal_10052423009427456", "score": 83, "level": "重点", "reason": "奖学金评选通知，身份相符（在读本科生），但学生关注方向为科研项目和国际交流，未直接命中奖学金兴趣，且需学院推荐、行动性中等，故评为推荐。；适用对象包含你的身份/年级"}], "rec": [{"notice_id": "portal_9965110438912000", "score": 75, "level": "推荐", "reason": "全校本科生可参加的AI文生视频比赛，有明确截止日期，能提升实践能力；但学生关注方向为科研项目和国际交流，未直接命中，属弱相关机会。；有明确截止日期"}, {"notice_id": "portal_10041395622174720", "score": 70, "level": "推荐", "reason": "职业规划大赛属比赛竞赛类，面向本科生开放且需报名，与学生提升实践能力的目标相关；但学生关注方向为科研项目和国际交流，未直接命中，故为推荐而非重点。；适用对象包含你的身份/年级、有明确截止日期"}], "all": [{"notice_id": "portal_10406429312061440", "score": 30, "level": "普通", "reason": "该通知为外语类专业教学改革讲座的回顾报道，与学生金融学专业及科研项目、国际交流等关注方向无关，且属事后回顾无需行动。；适用对象包含你的身份/年级；活动已于 2025-10-15 结束，无需再行动"}, {"notice_id": "portal_10374726230466560", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "9324c4d80d15be9ea6f5da2bef735809", "score": 25, "level": "普通", "reason": "该通知为外语专业改革讲座的事后回顾报道，；且内容属外语学院教学改革，与学生（国际经济贸易学院、金融学方向）的关注方向（科研项目、国际交流）不吻合。；适用对象包含你的身份/年级；活动已于 2026-10-15 结束，无需再行动"}, {"notice_id": "portal_9979206169255936", "score": 41, "level": "普通", "reason": "虽属国际交流方向，但这是面向墨西哥、巴西孔院学员的体验营开班报道，本校学生无需报名或参与，属于事后新闻，无行动价值。；符合关注方向「国际交流」；活动已于 2026-10-12 结束，无需再行动"}, {"notice_id": "portal_9984598646099968", "score": 44, "level": "普通", "reason": "职业规划讲座属信息性活动，但明确面向2026级本科新生，大二学生非目标对象，且未命中科研项目/国际交流等关注方向。；适用对象包含你的身份/年级、符合大二阶段需求；活动已于 2026-10-15 结束，无需再行动"}, {"notice_id": "portal_10031654622367744", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10031904858738688", "score": 20, "level": "普通", "reason": "该通知为已举办讲座的事后报道，学生无需行动；且面向教师和硕博，学生为本科生，兴趣方向（科研项目、国际交流）未命中。；活动已于 2026-10-12 结束，无需再行动"}, {"notice_id": "portal_10041141724176384", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10052860399837184", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10048626707128320", "score": 41, "level": "普通", "reason": "虽属国际交流方向，但为巴西孔院面向当地高校的商务讲座，非本校学生可参与的活动，且无报名或行动要求，相关度低。；符合关注方向「国际交流」；活动已于 2025-10-15 结束，无需再行动"}, {"notice_id": "portal_10050677520457728", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10069743220023296", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_9947609453813760", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_9948285003796480", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_9683597663133696", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_9965110438912000", "score": 75, "level": "推荐", "reason": "全校本科生可参加的AI文生视频比赛，有明确截止日期，能提升实践能力；但学生关注方向为科研项目和国际交流，未直接命中，属弱相关机会。；有明确截止日期"}, {"notice_id": "portal_9986849365549056", "score": 25, "level": "普通", "reason": "入党积极分子培训属行政党务类通知，与学生关注的科研项目、国际交流方向无关，也未命中必看关键词，不构成个人发展机会。；适用对象包含你的身份/年级"}, {"notice_id": "portal_10024833292951552", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10028058510004224", "score": 25, "level": "普通", "reason": "体质健康测试时间调整属教务事务性通知，与学生关注的科研项目、国际交流方向无关，也无需报名或申报行动。；适用对象包含你的身份/年级"}, {"notice_id": "portal_10041395622174720", "score": 70, "level": "推荐", "reason": "职业规划大赛属比赛竞赛类，面向本科生开放且需报名，与学生提升实践能力的目标相关；但学生关注方向为科研项目和国际交流，未直接命中，故为推荐而非重点。；适用对象包含你的身份/年级、有明确截止日期"}, {"notice_id": "portal_10041824137437184", "score": 25, "level": "普通", "reason": "退役士兵国家助学金名单公示，仅限退役士兵本科生，与普通大二学生身份不符，且属结果公示无需行动，未命中科研项目/国际交流等关注方向。；适用对象包含你的身份/年级"}, {"notice_id": "portal_10052423009427456", "score": 83, "level": "重点", "reason": "奖学金评选通知，身份相符（在读本科生），但学生关注方向为科研项目和国际交流，未直接命中奖学金兴趣，且需学院推荐、行动性中等，故评为推荐。；适用对象包含你的身份/年级"}, {"notice_id": "portal_10067009513885696", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10092419685453824", "score": 50, "level": "普通", "reason": "劳动教育实践课程属通识实践类，与学生关注的科研项目、国际交流方向不吻合，仅与提升实践能力目标弱相关，且无明确行动紧迫性。；适用对象包含你的身份/年级"}, {"notice_id": "portal_10109871358119936", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "93983756ae4a777747724b3267f07abb", "score": 15, "level": "普通", "reason": "行政党务类学习研讨通知，与学生关注的科研项目、国际交流方向无关，且非其学院活动，无需个人行动。"}, {"notice_id": "018e04b496b2526708ac0f78c17f7411", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "16268ec7a3739fd551b92cbbb62835c2", "score": 29, "level": "普通", "reason": "港澳台新生见面会仅面向港澳台新生，该生为大二在读本科生且非港澳台新生，身份不符；内容为入学教育与政策宣讲，与其科研项目、国际交流关注方向无关。；适用对象包含你的身份/年级、符合大二阶段需求；活动已于 2026-10-15 结束，无需再行动"}, {"notice_id": "aaa03f584aae465d77ad7c536138123c", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_9616506128601088", "score": 19, "level": "普通", "reason": "行政党务类红色宣讲事迹报道，与学生关注的科研项目、国际交流方向无关，且无学生可参与的行动任务。；符合大二阶段需求"}, {"notice_id": "portal_9680360474140672", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_9691003566678016", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10067939399471104", "score": 45, "level": "普通", "reason": "国际交流方向命中，全校可参与，但为来访学术交流活动、无报名或行动要求，且非金融专业对口，属信息性推荐。；符合关注方向「国际交流」；活动已于 2026-09-17 结束，无需再行动"}, {"notice_id": "portal_10068257474514944", "score": 24, "level": "普通", "reason": "该通知面向在读博士生，是已举办论坛的事后报道，本科生身份不符且无需行动，与科研项目、国际交流等关注方向无实质关联。；符合关注方向「国际交流」；活动已于 2026-09-19 结束，无需再行动"}, {"notice_id": "portal_9590922054197248", "score": 25, "level": "普通", "reason": "该通知仅面向2026级心理委员开展心理健康MOOC培训，与学生（大二、金融学、关注科研项目与国际交流）的身份和关注方向均不匹配，无需行动。；适用对象包含你的身份/年级"}, {"notice_id": "ba21a5d6ad740dee0e49cc0ba8ebe9d5", "score": 35, "level": "普通", "reason": "外语学院保研结果公示，属他院升学新闻，学生为经贸学院大二且兴趣为科研项目/国际交流，无行动项，仅弱相关。"}, {"notice_id": "bdf3eb1ad4525eb4239be616542f2836", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "83aced04b6e65589003528035fd0b926", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "05f47cdec6c831543f98d8bf97858a78", "score": 20, "level": "普通", "reason": "该通知面向硕士统考报考者公布招生计划，学生为在读大二本科生，无需报考，且未命中其科研项目、国际交流等关注方向。"}, {"notice_id": "212131789a07ca0aca66a982db96a308", "score": 24, "level": "普通", "reason": "外语学院新生开学典礼，学生为经贸学院大二在读生，非新生且非本学院活动，与科研项目、国际交流等关注方向无关，无需行动。；适用对象包含你的身份/年级、符合大二阶段需求；活动已于 2026-09-10 结束，无需再行动"}, {"notice_id": "f8c05cf67fdcd29ef204abbb06457942", "score": 38, "level": "普通", "reason": "图书馆数据库使用培训属于工具类培训，按规则压分；虽面向全校且与学生科研项目、国际交流方向有弱关联，但非学术讲座也非可行动机会，相关度一般。；活动已于 2026-10-15 结束，无需再行动"}, {"notice_id": "5fffedbb30bff30cecc1bfdde6028d19", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "3fea89f2f672ad6bb471a2d39aa50a0c", "score": 25, "level": "普通", "reason": "该通知为法学院法律沙龙征文获奖名单公示，属于结果公示类信息，学生无需行动；且学生为国际经济贸易学院金融学专业，兴趣方向为科研项目和国际交流，与法律沙龙征文活动不相关。；适用对象包含你的身份/年级"}, {"notice_id": "7ec24f416fabdde0e43c28a9e507b008", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_8490918697406464", "score": 55, "level": "普通", "reason": "就业招聘汇总虽为可行动清单，但学生关注方向为科研项目与国际交流，未命中就业实习，仅因全校适用和潜在实践价值给中等分。"}], "favs": [{"notice_id": "portal_7145822500589568"}], "trash": [], "todos": [], "reads": ["portal_7156727772078080"]}, "202620110284": {"student_no": "202620110284", "name": "可圆", "identity": "硕士研究生", "grade": "研一", "college": "国际经济贸易学院", "major": "金融学", "major_dir": "金融", "stage": "在读", "interests": ["国际交流", "比赛竞赛", "奖学金"], "goal": ["保研/申博"], "preferences": ["所有相关通知", "截止日期提醒"], "custom_keywords": [], "block_words": [], "key": [{"notice_id": "portal_9683597663133696", "score": 99, "level": "重点", "reason": "面向全日制硕士研究生的助学金评选，身份相符，且命中学生关注的“奖学金”方向，需提交申请材料，属于需行动的高价值机会。；符合关注方向「奖学金」、适用对象包含你的身份/年级"}, {"notice_id": "portal_9965110438912000", "score": 94, "level": "重点", "reason": "全校学生可参加的AI文生视频比赛，命中其“比赛竞赛”关注方向，有明确截止日期（10-25）需报名行动，身份年级均相符。；符合关注方向「比赛竞赛」、有明确截止日期"}, {"notice_id": "portal_10041395622174720", "score": 100, "level": "重点", "reason": "职业规划大赛校内选拔赛属于学生关注的比赛竞赛方向，面向硕士生开放，研一可报名，有明确截止日期（11月13日），需行动报名，且与就业/生涯发展相关。；符合关注方向「比赛竞赛」、适用对象包含你的身份/年级、有明确截止日期"}, {"notice_id": "portal_10052423009427456", "score": 99, "level": "重点", "reason": "奖学金评选通知，命中其“奖学金”关注方向，面向在读硕士生身份相符，需学院申请推荐有行动性，虽未写截止日期但属高价值评优机会。；符合关注方向「奖学金」、适用对象包含你的身份/年级"}], "rec": [{"notice_id": "portal_8490918697406464", "score": 72, "level": "推荐", "reason": "就业实习类一周招聘宣讲清单，全校可参加、时间地点明确，但学生关注方向为国际交流/竞赛/奖学金，就业非其核心兴趣，故为推荐而非重点。"}], "all": [{"notice_id": "portal_10406429312061440", "score": 20, "level": "普通", "reason": "该通知为外语类专业教学改革讲座的回顾报道，面向教师与本科生，与金融学硕士生的国际交流、竞赛、奖学金等关注方向无关，且属事后回顾无需行动。；活动已于 2025-10-15 结束，无需再行动"}, {"notice_id": "portal_10374726230466560", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "9324c4d80d15be9ea6f5da2bef735809", "score": 25, "level": "普通", "reason": "该通知为外语专业改革讲座的事后回顾报道，学生为金融学研一，专业方向不符，且兴趣（国际交流/比赛竞赛/奖学金）均未命中，活动已结束无需行动。；适用对象包含你的身份/年级；活动已于 2026-10-15 结束，无需再行动"}, {"notice_id": "portal_9979206169255936", "score": 41, "level": "普通", "reason": "虽属国际交流方向，但这是面向墨西哥、巴西孔院学员的体验营开班报道，本校学生无需报名或参与，属于事后新闻，无行动性。；符合关注方向「国际交流」；活动已于 2026-10-12 结束，无需再行动"}, {"notice_id": "portal_9984598646099968", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10031654622367744", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10031904858738688", "score": 25, "level": "普通", "reason": "该通知为已举办的讲座新闻（事后报道），学生兴趣方向（国际交流/比赛竞赛/奖学金）均未命中，且活动已结束无需行动。；适用对象包含你的身份/年级；活动已于 2026-10-12 结束，无需再行动"}, {"notice_id": "portal_10041141724176384", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10052860399837184", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10048626707128320", "score": 41, "level": "普通", "reason": "虽属国际交流方向，但为巴西孔院面向当地高校的商务讲座，非本校学生可参与的机会，且；符合关注方向「国际交流」；活动已于 2025-10-15 结束，无需再行动"}, {"notice_id": "portal_10050677520457728", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10069743220023296", "score": 20, "level": "普通", "reason": "校研究生会内部见面会与工作培训，属行政党务类活动，与学生关注的国际交流、比赛竞赛、奖学金方向无关，无需行动。；适用对象包含你的身份/年级；活动已于 2026-10-14 结束，无需再行动"}, {"notice_id": "portal_9947609453813760", "score": 30, "level": "普通", "reason": "通知面向研二/研三答辩阶段，研一学生尚不适用，且未命中其国际交流、竞赛、奖学金等关注方向。；适用对象包含你的身份/年级"}, {"notice_id": "portal_9948285003796480", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_9683597663133696", "score": 99, "level": "重点", "reason": "面向全日制硕士研究生的助学金评选，身份相符，且命中学生关注的“奖学金”方向，需提交申请材料，属于需行动的高价值机会。；符合关注方向「奖学金」、适用对象包含你的身份/年级"}, {"notice_id": "portal_9965110438912000", "score": 94, "level": "重点", "reason": "全校学生可参加的AI文生视频比赛，命中其“比赛竞赛”关注方向，有明确截止日期（10-25）需报名行动，身份年级均相符。；符合关注方向「比赛竞赛」、有明确截止日期"}, {"notice_id": "portal_9986849365549056", "score": 25, "level": "普通", "reason": "入党积极分子培训属行政党务类通知，与学生关注的国际交流、比赛竞赛、奖学金方向无关，且不涉及保研/申博需求。；适用对象包含你的身份/年级"}, {"notice_id": "portal_10024833292951552", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10028058510004224", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10041395622174720", "score": 100, "level": "重点", "reason": "职业规划大赛校内选拔赛属于学生关注的比赛竞赛方向，面向硕士生开放，研一可报名，有明确截止日期（11月13日），需行动报名，且与就业/生涯发展相关。；符合关注方向「比赛竞赛」、适用对象包含你的身份/年级、有明确截止日期"}, {"notice_id": "portal_10041824137437184", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10052423009427456", "score": 99, "level": "重点", "reason": "奖学金评选通知，命中其“奖学金”关注方向，面向在读硕士生身份相符，需学院申请推荐有行动性，虽未写截止日期但属高价值评优机会。；符合关注方向「奖学金」、适用对象包含你的身份/年级"}, {"notice_id": "portal_10067009513885696", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10092419685453824", "score": 40, "level": "普通", "reason": "劳动教育实践课程面向全体在读学生可报名，但与学生关注的国际交流、比赛竞赛、奖学金方向均不吻合，属于弱相关的教务选课通知。；适用对象包含你的身份/年级"}, {"notice_id": "portal_10109871358119936", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "93983756ae4a777747724b3267f07abb", "score": 15, "level": "普通", "reason": "行政党务类学习研讨通知，与学生关注的国际交流、竞赛、奖学金方向无关，且无需学生行动。"}, {"notice_id": "018e04b496b2526708ac0f78c17f7411", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "16268ec7a3739fd551b92cbbb62835c2", "score": 29, "level": "普通", "reason": "港澳台新生见面会仅面向港澳台新生，该生为内地硕士研一，身份不符且无行动需求，与其国际交流/竞赛/奖学金关注方向无关。；适用对象包含你的身份/年级、符合研一阶段需求；活动已于 2026-10-15 结束，无需再行动"}, {"notice_id": "aaa03f584aae465d77ad7c536138123c", "score": 20, "level": "普通", "reason": "学位答辩与论文提交面向研二/研三毕业生，研一学生阶段不符，且未命中其国际交流、比赛竞赛、奖学金等关注方向。；适用对象包含你的身份/年级"}, {"notice_id": "portal_9616506128601088", "score": 14, "level": "普通", "reason": "行政党务类红色宣讲事迹报道，与学生关注的国际交流、比赛竞赛、奖学金方向无关，且无学生任务。；符合研一阶段需求"}, {"notice_id": "portal_9680360474140672", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_9691003566678016", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_10067939399471104", "score": 45, "level": "普通", "reason": "命中你关注的国际交流方向，全校可参与，但属来访交流信息性活动，无报名或截止要求，行动性弱。；符合关注方向「国际交流」；活动已于 2026-09-17 结束，无需再行动"}, {"notice_id": "portal_10068257474514944", "score": 31, "level": "普通", "reason": "该论坛面向在读博士生，学生为研一硕士，身份不符；且为已举办的活动报道，无报名或参与行动，与其国际交流兴趣仅弱相关。；符合关注方向「国际交流」；活动已于 2026-09-19 结束，无需再行动"}, {"notice_id": "portal_9590922054197248", "score": 25, "level": "普通", "reason": "该通知仅面向2026级心理委员开展心理健康MOOC培训，学生为研一金融学硕士，既非心理委员，兴趣方向（国际交流/比赛竞赛/奖学金）也完全未命中，属于弱相关。；适用对象包含你的身份/年级"}, {"notice_id": "ba21a5d6ad740dee0e49cc0ba8ebe9d5", "score": 15, "level": "普通", "reason": "外语学院保研结果公示，属他院升学新闻，与金融学研一学生的国际交流/竞赛/奖学金关注方向无关，且无需行动。"}, {"notice_id": "bdf3eb1ad4525eb4239be616542f2836", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "83aced04b6e65589003528035fd0b926", "score": 25, "level": "普通", "reason": "双盲评审结果公布面向博士及同等学力硕士，研一金融学硕士不涉及学位论文答辩环节，且未命中其国际交流/竞赛/奖学金等关注方向，属无关信息。；适用对象包含你的身份/年级"}, {"notice_id": "05f47cdec6c831543f98d8bf97858a78", "score": 15, "level": "普通", "reason": "该通知面向报考者公布硕士统考招生计划，学生为在读研一硕士，无需再报考，与关注方向（国际交流/比赛竞赛/奖学金）无关。"}, {"notice_id": "212131789a07ca0aca66a982db96a308", "score": 24, "level": "普通", "reason": "外语学院新生开学典礼，学生为国际经济贸易学院金融学研一，学院与专业均不对口，且属新生入学活动，与学生的国际交流、比赛竞赛、奖学金等关注方向无关。；适用对象包含你的身份/年级、符合研一阶段需求；活动已于 2026-09-10 结束，无需再行动"}, {"notice_id": "f8c05cf67fdcd29ef204abbb06457942", "score": 35, "level": "普通", "reason": "图书馆数据库使用培训属于工具类日常培训，按规则压分；学生关注国际交流、比赛竞赛、奖学金，均未命中，且无需行动。；活动已于 2026-10-15 结束，无需再行动"}, {"notice_id": "5fffedbb30bff30cecc1bfdde6028d19", "score": 20, "level": "普通", "reason": "该通知面向2027届预毕业研究生，学生为研一在读，年级不符且非毕业阶段，与其国际交流、比赛竞赛、奖学金等关注方向无关。；适用对象包含你的身份/年级"}, {"notice_id": "3fea89f2f672ad6bb471a2d39aa50a0c", "score": 35, "level": "普通", "reason": "法学院征文获奖名单公示，属纯结果公告，学生无需行动；且为法学院活动，与金融学专业及国际交流/竞赛/奖学金关注方向不直接相关。；适用对象包含你的身份/年级"}, {"notice_id": "7ec24f416fabdde0e43c28a9e507b008", "score": 0, "level": "普通", "reason": "适用对象不符"}, {"notice_id": "portal_8490918697406464", "score": 72, "level": "推荐", "reason": "就业实习类一周招聘宣讲清单，全校可参加、时间地点明确，但学生关注方向为国际交流/竞赛/奖学金，就业非其核心兴趣，故为推荐而非重点。"}], "favs": [], "trash": [], "todos": [], "reads": []}}, "index": {"portal_10406429312061440": {"notice_id": "portal_10406429312061440", "title": "“鼎新大讲堂”系列讲座精彩回顾 第1期：实施逆向设计理念，深化外语类专业综合改革", "source": "教务处", "category": "学术活动", "publish_time": "2026-10-17", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=10406429312061440", "deadline": "", "event_time": "2025-10-15", "summary": "教务处与英语学院举办第1期鼎新大讲堂讲座回顾", "content": "为持续深化本科教育教学改革,夯实本科专业建设根基，优化本科拔尖人才培养体系，10月15日，教务处联合英语学院在诚信楼1314举办“鼎新大讲堂”第1期讲座。教务处副处长徐雷、英语学院院长向明友、党委书记项洁和来自教务处、英语学院、学术刊物编辑部等单位的40余名师生参加了此次讲座。本次讲座由英语学院商务英语系主任李琳主持。本次讲座邀请孙有中教授作题为“实施逆向设计理念，深化外语类专业综合改革”的分享。孙教授从人工智能时代外语专业的机遇与挑战、成果导向教育（OBE）理念下的培养方案优化、跨学科融合与复合型人才培养、教学评价改革等方面详细阐述了自己关于深化外语类专业综合改革的建议。孙教授首先分析了当前外语专业面临的挑战。随着人工智能技术快速发展，机器翻译、智能写作等技术日益广泛地应用于基础语言服务领域，传统外语人才的就业空间与职业发展路径正在发生变化，社会对外语人才的能力要求也不断提高。与此同时，部分高校外语专业仍存在人才培养定位不够清晰、课程体系同质化、人才培养与社会需求适配度不足等问题。面对新的发展形势，外语专业应主动回应国家战略、行业产业和学生发展的多元需求，从单一语言技能培养向语言能力、专业知识与综合素养协同发展转变，进一步提升人才培养的特色与竞争力。在人才培养理念方面，孙教授重点阐释了成果导向教育（Outcome-BasedEducation，OBE）与逆向设计（BackwardDesign）的核心内涵。孙教授指出，传统人才培养往往以现有师资和课程资源为出发点，而成果导向教育强调从学生毕业时应具备的知识、能力与素质出发，反向设计人才培养方案、课程体系和教学活动。逆向设计则进一步将这一理念落实到课程教学层面，要求教师首先明确预期学习成果，其次确定能够证明学习成果达成的评价证据，最后据此设计教学内容与教学方法。通过建立培养目标、毕业要求、课程目标、教学活动与学习评价之间的有效衔接，形成以学生发展为中心、以学习成果为导向的教学体系，并通过持续收集学生反馈、改进教学实践，实现人才培养质量的动态提升。在人才培养定位与培养规格方面，孙教授强调外语专业改革应立足学校办学定位与学科特色，进一步明确人才培养目标，并将知识、能力与素质要求细化为具体、可观察、可评价的指标体系。孙教授结合对外经济贸易大学英语专业国际财经新闻与传播方向的人才培养方案，肯定了其在专业特色凝练和人才培养"}, "portal_10374726230466560": {"notice_id": "portal_10374726230466560", "title": "关于召开公费医疗管理委员会会议的通知", "source": "后勤处", "category": "行政党务", "publish_time": "2026-10-17", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=10374726230466560", "deadline": "", "event_time": "2026-10-20", "summary": "公费医疗管理委员会成员单位相关人员于10月20日参会", "content": "各委员会单位：为进一步规范我校公费医疗管理工作，提升学校医疗保障服务质量，公费医疗管理委员会办公室定于2026年10月20日召开公费医疗管理委员会会议，现将有关事项通知如下：时间：10月20日（周二）上午9:00-10:30地点：行政楼222参加人员：党委办公室/校长办公室、党委组织部/党委人才工作办公室、财务处、内控与审计处、人力资源处/党委教师工作部、校工会、离退休人员工作处、党委学生工作部/学生处/武装部、党委研究生工作部、研究生院、国际合作交流处、团委、后勤处等公费医疗管理委员会成员单位相关人员。联系人：陈老师64495166。后勤处校医院公费医疗管理委员会办公室2026年10月17日"}, "9324c4d80d15be9ea6f5da2bef735809": {"notice_id": "9324c4d80d15be9ea6f5da2bef735809", "title": "“鼎新大讲堂”系列讲座精彩回顾  第1期：实施逆向设计理念，深化外语类专业综合改革-部门动态-对外经济贸易大学教务处", "source": "教务处-部门动态", "category": "学术活动", "publish_time": "2026-10-17", "url": "http://jwc.uibe.edu.cn/bmdt/b9b79d98080f4d1f879e623c0c42dd41.htm", "deadline": "", "event_time": "2026-10-15", "summary": "教务处举办外语专业综合改革讲座，10月15日已举行", "content": "教务处|摄影：教务处|日期：2026-10-17|访问量：\n为持续深化本科教育教学改 革,夯实本科专业建设根基，优化本科拔尖人才培养体系，10月15日，教务处联合英语学院在诚信楼1314举办“鼎新大讲堂”第1期讲座。教务处副处长徐雷、英语学院院长向明友、党委书记项洁和来自教务处、英语学院、学术刊物编辑部等单位的40余名师生参加了此次讲座。本次讲座由英语学院商务英语系主任李琳主持。\n本次讲座邀请孙有中教授作题为“实施逆向设计理念，深化外语类专业综合改革”的分享。孙教授从人工智能时代外语专业的机遇与挑战、成果导向教育（OBE）理念下的培养方案优化、跨学科融合与复合型人才培养、教学评价改革等方面详细阐述了自己关于深化外语类专业综合改革的建议。\n孙教授首先分析了当前外语专业面临的挑战。随着人工智能技术快速发展，机器翻译、智能写作等技术日益广泛地应用于基础语言服务领域，传统外语人才的就业空间与职业发展路径正在发生变化，社会对外语人才的能力要求也不断提高。与此同时，部分高校外语专业仍存在人才培养定位不够清晰、课程体系同质化、人才培养与社会需求适配度不足等问题。面对新的发展形势，外语专业应主动回应国家战略、行业产业和学生发展的多元需求，从单一语言技能培养向语言能力、专业知识与综合素养协同发展转变，进一步提升人才培养的特色与竞争力。\n在人才培养理念方面，孙教授重点阐释了成果导向教育（Outcome-BasedEducation，OBE）与逆向设计（BackwardDesign）的核心内涵。孙教授指出，传统人才培养往往以现有师资和课程资源为出发点，而成果导向教育强调从学生毕业时应具备的知识、能力与素质出发，反向设计人才培养方案、课程体系和教学活动。逆向设计则进一步将这一理念落实到课程教学层面，要求教师首先明确预期学习成果，其次确定能够证明学习成果达成的评价证据，最后据此设计教学内容与教学方法。通过建立培养目标、毕业要求、课程目标、教学活动与学习评价之间的有效衔接，形成以学生发展为中心、以学习成果为导向的教学体系，并通过持续收集学生反馈、改进教学实践，实现人才培养质量的动态提升。\n在人才培养定位与培养规格方面，孙教授强调外语专业改革应立足学校办学定位与学科特色，进一步明确人才培养目标，并将知识、能力与素质要求细化为具体、可观察、可评价的指标体系。孙教授结合对外经济贸易大学英语专业国际财经新闻与传播方向的人才培养方案，肯定了其在专业特色凝练和人才培养定位方面的积极探索，并以“国际视野”“跨文化沟通能力”“财经新闻采编与传播能力”等培养要求为例，阐释了如何将抽象目标转化为具体的学习成果和评价证据。例如，通过跨文化比较报告、国际财经新闻分析、新闻报道作品及国际传播策划方案等实践成果，检验学生相关能力的达成情况，推动人才培养目标真正落实到课程教学与学生学习之中。针对人工智能时代外语教师的角色转型，孙教授指出，人工智能技术在语言训练、作文批改和信息处理等方面展现出显著优势，但教师在价值引导、思辨能力培养、跨文化理解和复杂问题解决等方面仍具有不可替代的重要作用。外语教师应主动适应技术变革，积极探索人机协同教学模式，利用人工智能提升教学效率，将教学重心从知识传授和语言纠错进一步转向学生高阶思维能力与综合素养的培养。\n讲座最后，与会教师围绕OBE理念下课程评价改革的实施路径进行了交流。针对如何从学院层面有效引导教师主动进行课程改革的问题，孙教授提出应将课程评价改革与教学研究、教师专业发展相结合，通过行动研究、课例研究及专项教学改革立项等方式，为教师开展课程改革提供支持。同时，可选取少数核心课程先行试点，围绕课程目标、教学内容、教学方法和评价方式开展系统性改革，形成示范案例后逐步推广，以教学研究推动教学实践创新，实现教学改革与教师发展的相互促进。\n本次讲座立足人工智能时代外语教育发展的现实需求，系统探讨了外语专业综合改革的方向与实施路径，进一步深化了与会师生对成果导向教育理念及外语人才培养转型的认识，为学院持续优化人才培养方案、深化教育教学改革、提升复合型外语人才培养质量提供了有益启示。\n嘉宾简介\n孙有中，北京外国语大学教授、博士生导师。教育部高等学校外国语言文学类专业教学指导委员会主任委员，教育部新文科建设专家组成员，国家教材委员会高校哲学社会科学专家组成员，中国英汉语比较研究会英语教学研究分会主任，中国翻译协会常务副会长兼跨文化交流研究委员会主任，中国教育国际交流协会国际传播分会理事长，中外语言文化比较学会外语教材研究专业委员会主任，国际应用语言学学会（AILA）国际委员，亚洲英语教师协会（AsiaTEFL)副会长，北京外国语大学中国外语教材研究中心（国家教材建设重点研究基地）主任，《国际论坛》期刊主编。主要研究领域包括外语教育、跨文化研究、国际传播、美国研究。\n（摄影：杨志高  供稿：刘欢 审核：项洁、李琳）\nCopyRight©版权所有：对外经济贸易大学教务处，ALLRightsReserved\n北京市朝阳区惠新东街10号邮编：100029"}, "portal_9979206169255936": {"notice_id": "portal_9979206169255936", "title": "墨西哥、巴西孔院中国语言文化体验营顺利开班", "source": "国际中文教育（商务）实践与研究基地", "category": "国际交流", "publish_time": "2026-10-16", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=9979206169255936", "deadline": "", "event_time": "2026-10-12", "summary": "墨西哥、巴西孔院体验营开班，60余名学员参加", "content": "2026年10月12日，我校墨西哥新莱昂自治大学、巴西FAAP大学孔子学院中国语言文化体验营开班仪式在我校举行。两国共60余名学员及带队教师参加。开班仪式上，国际中文教育（商务）实践与研究基地王佺副主任对营员和带队教师的到来表示热烈欢迎，并介绍了我校概况和贸大国际中文教育事业发展情况。带队教师和学员代表依次发言，感谢学校、孔子学院和国际中文教育（商务）实践与研究基地对本次活动的精心筹备与组织支持。外语学院西班牙语系外籍教师EduardoVer&aacute;staguideLeon分享了自己在我校墨西哥孔院学习汉语、来华参加体验营、赴贸大留学深造，并最终选择留校任教的人生经历。国际学院副院长杜培源介绍了学校留学生教育情况，鼓励大家未来来贸大学习深造，为促进中拉文化交流贡献力量。此次来自墨西哥和巴西孔院的60余名营员将在接下来的两周内赴北京、烟台、上海、深圳等地开展为期两周的语言文化体验活动，实地感受中国语言文化的魅力。"}, "portal_9984598646099968": {"notice_id": "portal_9984598646099968", "title": "方达律师事务所鲍晨校友为我院本科新生讲授学习与职业规划", "source": "法学院", "category": "其他", "publish_time": "2026-10-16", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=9984598646099968", "deadline": "", "event_time": "2026-10-15", "summary": "方达律师校友为2026级本科新生分享学习与职业规划", "content": "秋意渐深，惠园再叙。恰逢对外经济贸易大学建校75周年、法学院建院30周年，贸法建院30周年系列活动、惠园校友大讲坛暨法学院本科新生入学教育系列活动之“我与校友面对面”——贸法学子学习与职业规划漫谈于10月15日下午在求真楼319举办。方达律师事务所合伙人鲍晨律师担任本次活动的主讲嘉宾，法学院院长冯辉、院党委副书记张莉、本科生辅导员潘明辰和2026级全体本科新生参加活动。活动由张莉副书记主持。活动开始，冯辉院长致辞，他对鲍律师拨冗返校开展分享表示感谢。他指出，大一正是同学们接触专业学习、思考未来发展的关键节点，律师是贸法毕业生十分重要的职业方向之一。学院组织和邀请杰出校友返校分享学习与职业规划，是为了给同学们了解法学专业、思考未来发展方向提供宝贵机会。希望同学们珍惜本次交流机会，认真学习校友经验分享，有所思考与收获。鲍晨律师结合自身在校求学经历与多年涉外商事律师执业经验展开分享。谈及大学四年的成长，他援引大学时期辅导员的建议，勉励同学们既要深耕专业学习，也要珍视校园生活，坚持体育锻炼，培养个人兴趣爱好。他谈到，高中阶段的学习生活多由外界安排，进入大学，成长的主动权掌握在自己手中。同学们应当充分用好学校各类学习资源，主动发掘个人兴趣，打造自身差异化优势；同时要警惕短视频碎片化信息带来的消耗，坚持运动、涵养有益的兴趣爱好，为长远发展积蓄力量。谈及律师职业发展，鲍晨律师简要区分了非诉交易律师与诉讼律师的职业特点。他提出，律师行业的显著特质就是终身学习，需要跟随客户业务不断了解全新行业领域。他提醒大一新生不必过早锁定职业方向，但要扎实练好专业基本功，尤其是依托贸大“法律+商科+英语”的学科优势，打造核心竞争力。针对同学们关注的出国留学问题，鲍晨律师给出了务实、理性的建议。他表示，海外深造应当建立在清晰的个人目标之上，切忌盲目跟风。如果选择本科毕业后就出国，要明确自身学习与职业诉求，全面评估自身的实际情况，留学并不等于就业，要有理性、客观的认识。谈到人工智能对法律行业的影响，鲍晨校友认为，新工具能够提高基础工作的效率，但不能代替律师对事实、风险和交易安排作出的专业判断。尤其对年轻法律人而言，工具越便利，越不能跳过基础训练。他勉励同学们保持学习能力，把人工智能作为辅助工作的工具，在专业知识、行业理解和实践经验的积累中形成自己的判断力。在互动环节，同学们就跨行业知识如何积累、涉外法"}, "portal_10031654622367744": {"notice_id": "portal_10031654622367744", "title": "2026年京投资产经营开发事业部及管廊公司核心骨干人才培训班顺利开班", "source": "政府管理学院", "category": "行政党务", "publish_time": "2026-10-16", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=10031654622367744", "deadline": "", "event_time": "2026-10-14", "summary": "政府管理学院承办的京投公司骨干人才培训班于10月14日开班", "content": "10月14日上午，由政府管理学院承办的“2026年京投资产经营开发事业部及管廊公司核心骨干人才培训班”开班仪式在对外经济贸易大学求索楼809会议室举行。对外经济贸易大学校长助理、政府管理学院院长李明，政府管理学院院长助理、MPA教育中心常务副主任李雪飞，京投公司资产经营开发事业部总经理、党总支书记刘衍峰，京投公司资产经营开发事业部二级专家、副总经理王为林，北京京投城市管廊投资有限公司副总经理郭峰，京投资产经营开发事业部及管廊公司的54名核心骨干学员出席开班仪式。开班仪式由政府管理学院培训中心主任刘冬宁主持。李明首先代表学校欢迎嘉宾及学员们的到来，他提到对外经济贸易大学是教育部与商务部共建的“双一流”高校，在国企治理、城市基建、公共管理等领域学科底蕴深厚、师资力量雄厚。今年恰逢建校75周年，学院将以此次培训为纽带，不断加强、深化校企协同和产学研合作，在人才培养和储备上蓄力，为首都轨道交通事业高质量发展提供有力支撑。刘衍峰在培训动员讲话中提到，这是京投两个直属单位首次走进大学校园联合办班，既打破了单位壁垒、推动跨板块思想沟通与业务协同，也得益于学院创新设置公共课合班、专业课分班的教学模式，兼顾共性提升与分类赋能。当前京投正处在“十五五”规划开局起步之年，希望学员牢固树立和践行正确政绩观，严守培训纪律，把学习成果转化为推动工作的实际本领。开班仪式后，全体人员合影留念。"}, "portal_10031904858738688": {"notice_id": "portal_10031904858738688", "title": "贸大政管青年学者第十三期讲座成功举办", "source": "政府管理学院", "category": "学术活动", "publish_time": "2026-10-16", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=10031904858738688", "deadline": "", "event_time": "2026-10-12", "summary": "贸大政管青年学者第十三期讲座于10月12日举办，魏文池主讲", "content": "2026年10月12日下午，由对外经济贸易大学政府管理学院主办的“贸大政管青年学者讲座第十三期”在求索楼809会议室顺利举行。本期讲座以“Awareness,Costs,andTaxRefundClaims:FieldExperimentEvidence”为主题，邀请到清华大学公共管理学院魏文池副教授主讲，学院青年教师、博士生、硕士生等到场学习与交流。魏文池老师现任清华大学公共管理学院副教授、博士生导师。主要研究领域为政府预算与财政管理、公共部门绩效管理。主持国家自科青年项目（B类）[优青]等各类科研项目十多项。以独作和一作身份在PAR、JPART、Governance、PA发表论文10篇，在PMR、ARPA、PublicChoice等其它中英文高影响期刊发表论文共近20篇。获PMRA首届AvellanedaAward(2026,阿韦亚内达奖，全球公共管理最重要的学会之一PMRA最佳论文奖，每三年一届)，清华大学“学术新人奖”（2024，清华大学青年教师最高学术荣誉），ChinaPolicyScholarsGroup最佳政策研究论文奖（2022），China-AmericanAssociationforPublicAffairs最佳论文奖（2019）等奖项。担任JournalofComparativePolicyAnalysis、EnvironmentalPolicyandGovernance等期刊指导编辑、客座编辑。讲座中，魏文池老师围绕如何提升公民社会福利项目的参与度这一核心研究问题，从行为障碍和参与成本两个视角进行了理论构建，并以个税退税为具体研究观测领域，随后进一步介绍如何通过实地实验这一前沿研究方法来解答该问题。魏老师详细讲解了实地实验设计的过程与注意事项，并鼓励在座师生要多尝试运用前沿方法来解决具有实践价值与理论意义的问题。魏文池老师的分享兼具理论深度与实践意义，讲座现场气氛热烈，师生们就实地实验的设计、行政负担测量等问题与魏老师进行了深入交流。此次讲座的成功举办，拓宽了与会师生的学术视野，为学院师生提供了宝贵的学习与启发机会，激励大家持续开展高质量学术研究。"}, "portal_10041141724176384": {"notice_id": "portal_10041141724176384", "title": "关于社会化考试监考费发放公示", "source": "继续教育学院（高级研修学院）", "category": "行政党务", "publish_time": "2026-10-16", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=10041141724176384", "deadline": "", "event_time": "", "summary": "继续教育学院公示2026年9月社会化考试监考费发放名单，公示期3日", "content": "按照《对外经济贸易大学党政管理及其他专业技术人员学校专项工作绩效和管理绩效发放指导意见（试行）》精神，我院拟将发放2026年09月社会化考试监考费进行公示，发放原则及标准参照《继续教育与远程教育学院关于社会化考试各项费用标准》执行，公示期3日。在此期间，任何单位或个人如有异议，均可向我部门专项工作绩效领导小组署名提出。匿名异议恕不受理。联系人：褚妍64493011发放项目一：雅思考试考试时间：2026年09月发放人数：9名劳务派遣制人员发放项目二：托福网考&GRE考试考试时间：2026年09月发放人数：2名学校党政管理人员,16名劳务派遣制人员附件：发放名单2026.09.xlsx继续教育学院2026年10月16日"}, "portal_10052860399837184": {"notice_id": "portal_10052860399837184", "title": "研究生院召开研究生培养方案改革系列研讨会（文学大类）", "source": "研究生院", "category": "教务通知", "publish_time": "2026-10-16", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=10052860399837184", "deadline": "", "event_time": "2026-10-15", "summary": "研究生院召开文学大类培养方案改革研讨会，教师参会讨论", "content": "2026年是“十五五”开局之年，也是新一轮“双一流”建设启动年。为贯彻落实党和国家关于研究生教育新要求、新部署，提升高层次拔尖创新人才自主培养质量，高质量推进2027级研究生培养方案改革，在前期广泛调研基础上，10月15日上午，研究生院在诚信楼806会议室召开研究生培养方案改革系列研讨会（文学大类）。研究生院领导、相关培养单位分管领导、高校专家代表、行业专家代表、校友代表、研究生院工作人员参会。张悦副院长主持会议。会上，张悦副院长介绍了《对外经济贸易大学研究生培养方案修订指导意见（2027级）》的总体思路和改革重点,详细说明了在重塑培养目标、升级课程体系、完善培养环节等方面的改革举措、工作安排及配套保障。在培养单位发言环节，英语学院副院长陈功、外语学院副院长胡明、文学与国际传播学院副院长周琳高度认同本轮改革方向，认为指导意见精准回应了各学院前期调研中反映的问题，对相关改革举措表示赞同，表示将结合文学大类专业特色，加快课程建设，创新培养模式，推动培养方案改革落地。在各界代表交流环节，高校专家代表北京外国语大学人工智能与人类语言重点实验室教授刘红艳、行业专家代表人民教育出版社日语编辑室主任皮俊珺、校友代表2015级汉语国际教育硕士白莹莹分别从学术前沿、行业需求和校友成长角度，围绕专业特色、人工智能与人文素养、课程体系、学分设置、跨校合作等展开交流。三位代表充分肯定本轮改革方向，并提出意见建议，认为学校应坚持“外”字特色和全球治理的办学定位，注重引导文学类研究生关注并接触行业与社会的真实问题。魏玲院长作总结发言，对各位专家、校友和培养单位的支持表示感谢。她指出，应以本轮修订为契机，强化服务国家战略导向，加大改革力度，优化学分结构，完善课程体系。文学大类各培养单位可积极探索人工智能与语言文学交叉融合，推动国际传播课程建设，加强与业界的人才培养合作，在跨文化沟通和国际传播人才培养方面形成特色。下一步，研究生院将认真梳理本次研讨会提出的意见建议，加强与各培养单位的沟通协作，凝聚共识、形成合力，共同推动研究生培养方案改革高质量落地。"}, "portal_10048626707128320": {"notice_id": "portal_10048626707128320", "title": "我校巴西孔院为当地高校举办商务讲座", "source": "国际中文教育（商务）实践与研究基地", "category": "国际交流", "publish_time": "2026-10-16", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=10048626707128320", "deadline": "", "event_time": "2025-10-15", "summary": "巴西孔院为塞阿拉联邦大学师生举办商务讲座，10月15日举行", "content": "当地时间10月15日,巴西FAAP商务孔子学院中方院长朱晓姝教授应塞阿拉联邦大学(UniversidadeFederaldeCear&aacute;）孔子学院中方院长茹宁教授及外方院长NonatoFurtado教授的邀请,为该校师生举办题为“为什么是中国,为什么要商务谈判”的专题讲座。讲座全程使用葡萄牙语进行,以扩大受众面,方便更多师生及相关人士参与和理解。本次讲座采用线上线下结合的方式举行,线下约有三四十人参加,线上参与人数达数百人。朱院长围绕中国文化基本理念、商务交往礼仪、名片交换、商务宴请及商务谈判等内容进行了深入浅出的讲解,并分享了如何与中国人建立联系、增进信任,以及培养批判性思维和创造性思维等方面的内容。现场气氛友好热烈,互动积极。朱教授还就观众提出的问题进行了细致解答,进一步加深了巴西师生对中国文化与商务实践的了解。此次讲座为中巴教育与商务交流搭建了沟通桥梁,也进一步提升了FAAP商务孔子学院在巴西北部地区的影响力。"}, "portal_10050677520457728": {"notice_id": "portal_10050677520457728", "title": "继续教育学院国际课程项目招生考试监考费用公示", "source": "继续教育学院（高级研修学院）", "category": "行政党务", "publish_time": "2026-10-16", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=10050677520457728", "deadline": "", "event_time": "", "summary": "继续教育学院公示招生考试监考费用，10月21日前可提异议", "content": "按照《对外经济贸易大学党政管理及其他专业技术人员学校专项工作绩效和管理绩效发放指导意见（试行）》精神及学校相关要求，我院拟发放国际课程项目人员招生考试监考费用情况进行公示，本公示期自2026年10月16日至10月21日。在此期间，任何单位或个人如有异议，均可向我部门专项工作人员署名提出。匿名异议恕不受理。联系人：褚妍64493011附：附件2026年国际课程项目招生考试费用名单.xlsx继续教育学院2026年10月16日"}, "portal_10069743220023296": {"notice_id": "portal_10069743220023296", "title": "校研究生会举办2026年新成员见面会暨秋季学期工作培训会", "source": "研究生工作部", "category": "行政党务", "publish_time": "2026-10-16", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=10069743220023296", "deadline": "", "event_time": "2026-10-14", "summary": "校研究生会召开新成员见面会暨秋季工作培训会", "content": "10月14日晚，对外经济贸易大学研究生会2026年秋季学期第一次全体大会于博学楼207教室召开。校研究生会秘书长、国家对外开放研究院分团委书记董俊缨，校研究生会主席团成员、各部门学生负责人及2026级新成员参加大会。师者寄语，扬帆起航董俊缨老师首先向新加入研会的成员表示祝福与欢迎，并重点围绕三句话与全体成员深入交流。第一，牢记服务本色，要“做青年友，不做青年官”，要把同学们在学业、科研、就业、权益、生活上的真实需求作为工作的出发点，把服务做到同学心坎上。第二，“学生骨干”的标签既是荣誉，更是约束，学生身份永远是第一身份，要努力做到学习工作两不误；同时要爱惜羽毛，研会工作的每一件事都要经得起看、经得起问，不因一时方便、一点虚荣损害个人声誉和研会形象。第三，把研会工作当成一项事业来做，敢于创造、敢于试错。不只满足于“完成规定动作”，而要大胆想、谨慎做、及时改，打造有贸大特色、研究生特点的品牌项目。董老师表示，她将做好大家的支持者、提醒者和陪伴者，与同学们一起把这一届研会做出温度、做出水平、做出影响。同心同行，共绘蓝图主席团成员蔡艺鸥同学代表主席团发言，为新成员详细介绍了研会的整体工作与未来规划。她谈到，研究生会是在校党委领导下，在校团委和党委研究生工作部指导下开展工作的校级研究生组织，要始终把“全心全意服务研究生”作为出发点和落脚点，在思想引领、学术创新、文体活动、权益服务、组织建设等方面努力为同学们搭建更宽阔的舞台。研会的共同课题是让六个部门真正融在一起，不是“你们”和“我们”，而是“咱们研会”，通过多搭跨部门交流与合作的桥梁，让每一位成员既能施展本领，也能找到归属、获得支持。随后，各部门负责人依次登台，就本部门的核心职能与重点工作进行清晰阐述，帮助新成员全面了解研会的整体架构与运作模式。新声初绽，风华正茂在热烈融洽的会议氛围中，各部门新成员接连登台，用各具特色的自我介绍展现青春风采。新鲜血液的注入，让研会大家庭充满活力与朝气，也让全体成员对接下来一年并肩同行的旅程充满期待。礼赞耕耘，致敬榜样在过去的一学年中，校研究生会各项活动稳步推进、精彩纷呈，每一份成绩的背后，都凝聚着研会成员的默默耕耘与无私奉献。董俊缨老师为2025-2026学年表现优异的研究生会成员颁发荣誉证书，以表彰他们为研会发展所作出的积极贡献，并鼓励全体成员学习榜样、奋发进取，继续把服务同学的热"}, "portal_9947609453813760": {"notice_id": "portal_9947609453813760", "title": "2026年下半年研究生答辩及论文提交注意事项", "source": "研究生院", "category": "教务通知", "publish_time": "2026-10-16", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=9947609453813760", "deadline": "", "event_time": "", "summary": "学位申请人需关注答辩安排并按要求提交材料，答辩10月中下旬至11月中下旬", "content": "各学位申请人：2026年下半年研究生答辩即将启动，学位论文交存出现新变化，现就有关事项通知如下：一、系统查阅论文评阅结果、学院答辩安排和答辩结果会随时在“研究生综合管理信息系统”（点击查阅，下同）更新，请随时关注通知并及时查看。二、答辩及论文修改（一）答辩安排2026年下半年答辩时间大致安排在10月中下旬至11月中下旬，具体日期由各学院自行安排。答辩前，学位申请人应根据《对外经济贸易大学在学位论文和毕业论文（设计）中规范使用人工智能技术的指导意见（试行）》提交《人工智能技术使用声明》。学位申请人还应提交《博士/硕士学位论文答辩导师意见书》，学位论文经导师审查同意后，方能参加答辩。此外，双盲送审的学位申请人应等待评阅结果，通过后才能参加答辩。（二）答辩材料学院统一领取硕士答辩材料。双盲结果通过后，研究生院学位办组织发放博士答辩材料（请关注双盲结果公示通知）。（三）答辩要求答辩人应到现场答辩，使用PPT，完整介绍学位论文基本情况，制作好的PPT应在答辩前提交给答辩秘书或学院教务员。学位论文在答辩前送答辩委员会组成人员审阅，评阅意见是答辩评议的重要参考材料。在双盲评审中被预警的博士生，应在答辩现场向答辩委员会陈述学位论文修改情况。（四）答辩后学位论文修改答辩委员会认为学位论文虽能通过答辩，但在学位审议前应做必要修改的，答辩人应完成“学位论文答辩后修改”环节，详见关于进一步推进研究生学位论文答辩后修改工作的通知。答辩虽通过但答辩平均成绩不足70分的，或答辩委员会认为论文应做重大修改的，进入答辩后修改鉴定程序。对于鉴定不合格的论文，将在学位评定分委员会上通报审查。进入答辩后修改鉴定程序的学位申请人，应填写归档《研究生学位论文答辩后修改鉴定表》，答辩材料袋中《研究生学位论文答辩后修改反馈情况表》作废。未进入鉴定程序的学位申请人，在答辩后学位论文修改后，填写归档答辩材料袋中的《研究生学位论文答辩后修改反馈情况表》。三、格式规范性检测学位申请人在答辩结束后、提交学位论文定稿之前，应完成学位论文格式规范性检测，具体检测时间由学院自行安排，详见关于开展研究生学位论文格式规范性检测的通知（点击查看）。检测结果将作为学位论文形式审查重要依据，请认真对待检测结果，确保论文写作规范性。学位论文格式规范性检测以差错率低于万分之三为合格标准，对于最终检测不合格的学位论文，学院学位评定分委员会将重点"}, "portal_9948285003796480": {"notice_id": "portal_9948285003796480", "title": "关于领取2026级新生入学体检表并归档的通知", "source": "后勤处", "category": "行政党务", "publish_time": "2026-10-16", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=9948285003796480", "deadline": "", "event_time": "", "summary": "新生辅导员到校医院领取2026级新生体检表并归档", "content": "各位新生辅导员：自2026年起，学生入学体检表将在体检结束后及时返回各学院进行归档。请各学院新生辅导员以学院为单位，前往校医院保健科统一领取2026级新生体检表。转专业学生的体检表由原学院领取。领取时间：8:00-11:30，13:30-16:30（周三下午不办理）。后勤处校医院2026年10月16日"}, "portal_9683597663133696": {"notice_id": "portal_9683597663133696", "title": "关于开展2026-2027学年研究生小米助学金评选工作的通知", "source": "研究生工作部", "category": "奖助学金", "publish_time": "2026-10-16", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=9683597663133696", "deadline": "", "event_time": "", "summary": "面向家庭经济困难全日制硕士研究生的助学金评选，需提交申请材料", "content": "各培养单位、各位研究生：为进一步培养德育为先、能力为重、全面发展的优秀大学生，北京小米公益基金会在我校设立研究生小米助学金，用以激励家庭经济困难研究生勤奋学习、自强进取。现将2026-2027学年评选工作通知如下：一、评选对象我校在基本修业年限内、档案在校、具有中华人民共和国国籍且纳入全国研究生招生计划的家庭经济困难全日制硕士研究生（其中就业方式为定向就业的仅限于非在职“少数民族高层次骨干人才计划”的研究生，其他定向就业的除外）。二、评选条件1.热爱社会主义祖国，拥护中国共产党的领导；2.遵守宪法和法律，遵守学校规章制度；3.诚实守信，道德品质优良；4.勤奋上进，学习态度端正；5.已认定为2026-2027学年家庭经济困难研究生，生活俭朴。三、资助标准小米助学金每学年资助8名硕士研究生，资助金额为每人5000元人民币。四、组织机构学校2026-2027学年研究生奖助工作领导小组指导开展评定等相关工作，由研工部负责具体实施。各研究生培养单位由2026-2027学年研究生奖助工作评审委员会负责组织本单位研究生小米助学金的申请、初审推荐和申诉处理等工作。五、评选程序1.评选工作坚持公平、公正、公开、实事求是的原则。2.研工部依据各培养单位符合参评条件的研究生人数进行测算，确定各单位研究生小米助学金的参评名额（附件1）。3.各培养单位负责组织学生申请，申请人如实填写《对外经济贸易大学研究生小米助学金申请表》（附件2），并同时提交各类证明材料。4.各培养单位对申请人材料进行初审，确定参评人员后在本单位内进行不少于3个工作日的公示。公示期间如有异议，以书面、实名形式反映，由各培养单位予以答复。公示无异议后，各培养单位将参评人员材料提交至研工部。5.由学校研究生奖助工作领导小组依据参评人员材料进行评审工作。评选结果在全校范围内进行不少于5个工作日的公示。公示期间如有异议，以书面、实名形式反映，由研工部予以答复。公示无异议后，由研工部将获助学生名单及材料提交至学校校友与基金工作处和设奖方确认生效。六、报送材料请各培养单位填写《2026-2027学年研究生小米助学金参评人员汇总表》（附件3），并将参评人员《对外经济贸易大学研究生小米助学金申请表》（附件2）及其他证明材料一并上交。纸质版材料需按照要求签字盖章后提交至求真楼东409室，附件3电子版发送至邮箱：uibeygbjz@uibe"}, "portal_9965110438912000": {"notice_id": "portal_9965110438912000", "title": "诚信教育系列活动之：关于组织参加2026年“诚信记忆”AI文生视频作品征集活动的通知", "source": "学工部", "category": "比赛竞赛", "publish_time": "2026-10-16", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=9965110438912000", "deadline": "2026-10-25", "event_time": "", "summary": "全校学生参加AI文生视频征集，10月25日前报名", "content": "各学院、各位同学：为落实国家“十五五”规划纲要“弘扬诚信文化”任务部署，进一步加强诚信教育，培育时代新人，根据北京市有关文件要求，结合我校“诚以立身，信以致远”诚信教育系列活动方案安排，现组织全校学生参加“诚信记忆”AI文生视频作品征集活动。具体通知如下：一、活动主题主题为“协同拥抱AI大兴诚信文化”。本次活动以“诚信赋能、校企协同、跨域共赢”为核心，通过AI创作、实战竞答、能力提升三类活动有机结合，构建跨区域校园诚信文化传播矩阵，助力社会信用体系建设。二、组织单位发起单位：北京市教育委员会、北京市经济和信息化局、北京市广播电视局、北京市文化和旅游局、北京市工商业联合会主办单位：北京市大兴区教育委员会联办单位：天津、河北、山西、湖北、河南、内蒙等相关教育单位。本次活动由发起单位、联办单位、支持单位共同组成组委会。组委会办公室设在大兴区教育委员会，日常工作由大兴区教育融媒体中心具体承担。支持单位（北京地区）：新华社中国经济信息社、中国教育电视台、北京市广播电视台、北京印刷学院、民政职业大学、北京大兴经济开发区管委会、大兴区工商联各联办市县支持单位，由所在地联办单位协商组织。三、参赛对象全校学生四、活动时间活动截稿时间为2026年11月1日五、征集方式（一）本次活动分设五个赛道，我校学生可对应参加“醉美行家”（大学生群体）赛道。（二）活动采取“企业（或社会个体）出题、师生作答”的方式，聚焦企业诚信经营案例或故事，运用AI制作工具创作相关作品，以AI创作赋能诚信传播。企业将围绕企业诚信故事、品牌信用建设、行业诚信规范、诚信公益宣传、产品诚信承诺等诚信主题发布创作邀约，明确创作时长、风格、交付标准及奖励（含现金奖励、企业实习名额、文创产品、商业合作机会等多种形式，具体以企业方案为主）。（三）作品征集以“周周有新题、月月有打榜、年度有评奖”的打擂方式推进，周评和月奖由各地联办单位组织实施，评审拟采取“大众投票+企业评审”相结合的方式，获奖作品将由大兴区教委和联办市县教育局联合颁发证书。年度精品佳作由北京市教委等发起单位颁发证书，作品评选参考标准见附件1。六、活动流程（一）官方平台报名1.有意参赛的同学请于10月25日前扫描官方报名二维码（见下方）进行信息录入，按要求如实、完整填写个人相关信息。填写注意事项如下"}, "portal_9986849365549056": {"notice_id": "portal_9986849365549056", "title": "关于举办2026年第2期入党积极分子培训班的通知", "source": "党委组织部", "category": "行政党务", "publish_time": "2026-10-16", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=9986849365549056", "deadline": "2026-10-30", "event_time": "", "summary": "入党积极分子培训班报名，10月30日前提交名单", "content": "各基层党委（党总支、直属党支部）： 根据《中国共产党发展党员工作细则》相关要求，结合我校党校培训计划安排，将举办2026年第2期入党积极分子培训班，现将有关通知发布如下：一、培训对象 未取得校级党校正式培训结业证书的入党积极分子（包括学生和在职教工）。 二、培训时间本期党校培训共计40学时。培训工作由校院两级党校共同组织实施。其中，学校统一组织的在线学习20学时，各基层党委（党总支、直属党支部）组织的线下课堂教学、实践教学、讨论学习20学时。三、培训方式 1.培训采取网上学习与实践学习相结合的方式。2.入党积极分子要完成网上课程的学习和测试（培训网址：http://jjfz.uibe.edu.cn/），完成各基层党委（党总支、直属党支部）安排的学习任务，达标后方能参加党校组织的统一结业考试；统一考试成绩合格者准予结业，颁发党校结业证书。3.学校党校办公室主要负责在线学习平台的教学管理和在线集中结业考试的组织工作；各基层党委（党总支、直属党支部）负责在线学习平台的学员日常管理、认定、心得体会批阅等工作，做好实践教学、讨论学习等工作。四、培训内容通过党校培训学习，使入党积极分子系统学习党的基本理论，了解党的路线、方针和政策，了解入党程序和要求，正确认识党员标准、入党条件以及党员的义务和权利，进一步端正入党动机，坚定共产主义理想信念，增强为党的事业而奋斗的信心，争取早日加入中国共产党。 五、报名资格及报名时间 各基层党委（党总支、直属党支部）要认真做好入党积极分子的资格审查（如年满十八周岁才能申请入党），推荐名额不限（以往未通过考试者需重新报名学习）。请各基层党委（党总支、直属党支部）专人负责、认真审核，确保报名人员参加学习和考试。报名名单请于10月30日（周五）下午5点前纸质版盖章报组织部行政楼257办公室，电子版发至zuzhibu@uibe.edu.cn。六、相关要求 1．入党积极分子参加党校培训是成为发展对象和发展入党的前提条件，培训期间的表现要作为组织发展的参考依据。请各基层党委（党总支、直属党支部）做好本单位入党积极分子的培训组织工作。 2．各基层党委（党总支、直属党支部）指定一名负责人，负责入党积极分子管理、协调、指导网上课程学习。3.学习期间转院或调动单位的学员，整个过程按照报名时的单位管理，直到本期学习结束。联系人：范泽龙64492534 杨洋64495"}, "portal_10024833292951552": {"notice_id": "portal_10024833292951552", "title": "关于组织2026-2027-1学期课堂教学观摩系列活动之校际优秀课堂观摩（第一期）的通知", "source": "教师发展与教学质量评估中心", "category": "教务通知", "publish_time": "2026-10-16", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=10024833292951552", "deadline": "2026-10-21", "event_time": "2026-10-26,2026-11-17", "summary": "教师报名校际课堂观摩，10月21日10:00截止", "content": "各院（部）及全体教师：为充分发挥教学名师、优质课程的引领示范作用，深化教学交流互鉴，教师发展与教学质量评估中心本学期将继续开展课堂教学观摩系列活动。其中，为深化校际教学交流互鉴，拓宽教师教学视野，促进优质教学经验共享，本学期拟启动校际优秀课堂观摩系列活动。现将第一期活动安排通知如下：一、观摩课程安排本期推出中央财经大学2门观摩课程，主讲教师及课程简介后附，教师可根据个人情况选择报名。序号课程名称主讲教师观摩日期上课时间上课地点名额授课对象1数字经济学概论刘航（教授，中国互联网经济研究院）10月26日（星期一）10:00-11:40学院南路校区主教1155人研究生2国际金融学陶坤玉（副教授，金融学院）11月17日（星期二）14:00-15:40沙河校区二教11110人本科生二、参与人员校际优秀课堂观摩系列活动面向全校教师开放，建议青年教师、骨干教师积极参与教学观摩活动，汲取优秀教师、优质课堂的经验成果，促进个人教学能力提升。教师请于听课后两周内将《教师课堂教学观摩记录单》（见附件）提交到诚信楼621办公室。校际课堂教学观摩系列活动计入新入职教师“教学观摩”培训模块。三、报名安排1.报名时间：请于2026年10月21日（星期三）10:00前完成报名。2.报名方式：请扫描下方二维码进入小程序报名，选择拟观摩课程。每门课程听课名额有限，按报名先后顺序确定，额满即止，报名结果另行通知。3.交通保障：前往观摩的交通安排，学校将视报名及行程情况统一组织，或按政策规定减免交通费用。四、观摩要求1.按时到场。请各位老师配合完成入校手续，提前10分钟到达上课教室，经任课教师同意后进入课堂。2.遵守课堂纪律。观摩期间保持安静，不中途离开教室，确保课堂有序进行。3.注重成果转化。填写《教师课堂教学观摩记录单》，做好听课记录与教学反思，中心将适时组织交流分享，促进观摩成果落地应用。五、活动积分兑换1.为了鼓励学校教师积极参与相关教师教学发展系列活动，促进教师的专业成长、拓宽教学视野，提升教师教学能力，教师中心继续开展积分兑换活动，参与相关教师教学发展活动即可获得相应活动积分。每集满8个活动积分的教师即可在工作时间内到诚信楼619室兑换课堂教学辅助用具一份。2.请教师自行记录相应积分情况，进行礼品兑换时由教师中心统一核定。3.报名成功后，完整参与一次课堂观摩活动并提交《教师课堂教学观摩记录单"}, "portal_10028058510004224": {"notice_id": "portal_10028058510004224", "title": "关于调整部分学院体质健康集中测试及补测时间的通知", "source": "体育部", "category": "教务通知", "publish_time": "2026-10-16", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=10028058510004224", "deadline": "", "event_time": "2026-11-01,2026-11-07", "summary": "部分学院体测及补测时间调整，学生按新时间参加", "content": "根据天气预报显示，本周六有强降雨，为保障学生测试安全，经研究，对以下测试时间做出调整：1.原定于10月17日（周六）进行集中测试的商学院、英语学院、国关学院、国合院，推迟至11月1日（周日）。2.原定于11月1日（周日）开展的体测补测，推迟至11月7日（周六）。特别提醒：请相关学院及时通知学生，按照变更后的测试时间参加测试。如遇天气情况变动，将另行通知。体育部2026年10月16日"}, "portal_10041395622174720": {"notice_id": "portal_10041395622174720", "title": "关于举办第四届全国大学生职业规划大赛校内选拔赛的通知", "source": "招生就业处", "category": "比赛竞赛", "publish_time": "2026-10-16", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=10041395622174720", "deadline": "2026-11-13", "event_time": "2026-10-01,2026-12-31", "summary": "面向本科生和研究生开展职业规划大赛校内选拔，11月13日报名截止", "content": "各学院：根据《教育部关于举办第四届全国大学生职业规划大赛的通知》（教学函〔2026〕2号）文件要求，强化高校生涯教育和就业指导，助力大学生增强职业规划意识，指导其通过学习实践提升综合素质和能力，及早做好就业准备，以择业新观念打开就业新天地，促进高质量充分就业。我校定于2026年10月至2026年12月举办第四届全国大学生职业规划大赛校内选拔赛。现将有关事项通知如下。一、大赛主题筑梦青春志在四方，规划启航职引未来。二、大赛时间2026年10月—2026年12月三、组织机构主办单位：招生就业处校内赛设立组委会，由校内就业指导老师、行业专家、校外就业指导专家组成，负责赛事评审工作，指导我校学生参赛。四、大赛内容（一）主体赛事1.成长赛道。面向本科非毕业年级（大一、大二、大三）学生，考察学生树立生涯发展理念并合理设定职业目标、围绕实现目标持续行动并不断调整的成长过程，通过学习实践提升综合素质和专业能力，体现正确的择业就业观念。2.就业赛道。面向本科高年级计划求职学生（大三、大四，不含已通过推免获得录取资格的学生）、全体第二学士学位学生和研究生。考察学生求职实战能力，个人综合素质、专业能力与目标职业的契合度，个人发展路径与就业市场需求的适应度。参赛学生可获得岗位录用意向。五、赛程材料要求参赛选手通过全国大学生职业规划大赛平台（以下简称大赛平台，网址：zgs.chsi.com.cn）进行报名，提交参赛材料。（一）成长赛道1.生涯发展报告：介绍设定职业目标的过程；实现职业目标的具体行动和成效；职业目标及行动的动态调整等（PDF格式，不超过10M，文字不超过2000字，图表不超过5张）。2.生涯发展展示（PPT格式，不超过50MB）。（二）就业赛道1.求职简历（PDF格式）。2.求职综合展示（PPT格式，不超过50MB）。3.辅助证明材料，包括实践、实习、获奖等证明材料（PDF格式，整合为单个文件，不超过10MB）。六、赛程安排大赛分学院选拔、校级复赛和校级决赛3个阶段。主要时间安排如下：（一）校级初赛所有报名参赛的选手均需在大赛平台（网址：zgs.chsi.com.cn）进行报名并提交参赛材料，在国家大赛平台登录页面可下载学生操作手册。各学院认真组织动员学生报名参赛，学生需通过国家大赛平台报名并提交参赛材料，同步提交至学院，学生参赛报名截止时间为2026年11月13日17:00。"}, "portal_10041824137437184": {"notice_id": "portal_10041824137437184", "title": "关于2026-2027学年退役士兵国家助学金拟资助学生名单的公示", "source": "学工部", "category": "奖助学金", "publish_time": "2026-10-16", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=10041824137437184", "deadline": "", "event_time": "", "summary": "退役士兵本科生国家助学金拟资助名单公示，10月20日前可提异议", "content": "各学院、各位同学：根据退役军人事务部、教育部、财政部、人力资源社会保障部、中央军委政治工作部、中央军委训练管理部、中央军委国防动员部等七部门《关于全面做好退役士兵教育培训工作的指导意见》（退役军人部发〔2021〕53号）等文件精神和要求，我校组织开展2026-2027学年在校退役士兵本科学生国家助学金评审工作。经个人申请，党委武装部审核，确定退役士兵学生国家助学金拟资助名单，现予以公示。公示时间为2026年10月16日-10月20日，公示期内如有异议，请以书面、实名形式向党委武装部（求真楼212室）反映。以个人名义反映意见，须留下真实姓名和联系方式；以组织名义反映意见或建议，须加盖组织公章；以匿名方式反映意见，不予受理。联系人：杨老师；联系电话：64492334。附件：2026-2027学年退役士兵国家助学金拟资助学生名单.pdf学工部/学生处/武装部2026年10月16日"}, "portal_10052423009427456": {"notice_id": "portal_10052423009427456", "title": "关于评选对外经济贸易大学2026年“十大杰出学生”暨金沓奖学金的通知", "source": "学工部", "category": "奖助学金", "publish_time": "2026-10-16", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=10052423009427456", "deadline": "", "event_time": "", "summary": "面向本科生和研究生评选十大杰出学生暨金沓奖学金，需经学院申请推荐", "content": "各学院：为深入贯彻落实习近平新时代中国特色社会主义思想，落实立德树人根本任务，深化五育并举，选树先进典型，发挥榜样育人效应，促进学生德智体美劳全面发展，引导学生成长为担当民族复兴大任的时代新人，根据《对外经济贸易大学“十大杰出学生”荣誉称号评选办法(2025年修订)》（贸大党发〔2025〕34号），现开展对外经济贸易大学2026年本科生“十大杰出学生”、研究生“十大杰出学生”评选工作，相关事项通知如下：一、评选条件（一）热爱祖国，拥护中国共产党的领导。具有坚定正确的政治方向，拥护党和国家的路线、方针、政策。自觉践行社会主义核心价值观，有理想，有正确的世界观、人生观、价值观；（二）遵守宪法和法律，遵守学校各项规章制度，无违纪行为，诚实守信、品行端正、乐于奉献；（三）学习成绩优异，综合素质突出，德智体美劳全面发展；（四）积极组织或参与学校各类校园活动，热心服务同学；（五）在爱国奉献、参军报国、自强奋进、专业学习、学术科研、文艺体育、创新创业、社会实践、志愿服务等至少某一方面表现突出。二、评选名额及奖励金额每年评选本科生和研究生各10名，颁发金沓奖学金，奖励金额10000元人民币/人。三、评选程序1.各学院负责组织学生申请，申请人填写《对外经济贸易大学“十大杰出学生”申请表》（附件1、附件2），并提交相关证明材料；2.各学院本科生奖助工作领导小组、研究生奖助工作评审委员会按照公开、公平、公正的原则组织材料审核和初评推荐，初评方式和规则由学院自行规定。各学院确定拟推荐候选人名单后，院内公示3天。公示期间如有异议，需以书面、实名形式反映，由各学院予以答复；3.公示无异议后，各学院将推荐名单及相关材料进行上报，本科生材料报送至学工部学生资助管理中心，研究生材料报送至研工部；4.校级评选工作办公室组织召开评审答辩会，评选出“十大杰出学生”拟表彰学生人选，评选结果在校内公示3天。“十大杰出学生”拟表彰学生名单报送学校党委审批。四、申请材料（提交格式要求详见附件5）1.对外经济贸易大学“十大杰出学生”申请表（附件1、附件2）；2.申请书（1500字左右）；3.相关证明材料；4.学院开具的综合素质评价排名证明（附件4）；5.现场答辩PPT（按时长3分钟准备）。五、工作要求1.各学院要充分认识榜样育人工作的重要意义，积极广泛开展宣传动员，认真组织院级选拔。2.本科生院级推荐名额："}, "portal_10067009513885696": {"notice_id": "portal_10067009513885696", "title": "关于开展2026-2027-1学期院（部）本科教学督导工作的通知", "source": "教师发展与教学质量评估中心", "category": "教务通知", "publish_time": "2026-10-16", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=10067009513885696", "deadline": "2026-10-23", "event_time": "2026-10-19,2026-12-27", "summary": "各院部督导需10月23日前认领听课任务，10月19日起开展听课", "content": "各院（部）：为推动本科教学质量提升，厚植质量文化建设根基，加强院（部）督导队伍建设，强化校院两级督导实效，结合课程思政“一院一品”项目建设任务，本学期将依托院（部）本科教学督导并行开展常规听课及“一院一品”项目课程思政专项听课两项工作，现将具体安排通知如下：一、听课安排1.时间：2026年10月19日至2026年12月27日。2.范围（1）课程思政专项听课参与课程思政“一院一品”项目建设的本科教学单位参加本次专项听课，在常规听课评价维度基础上，重点考察“一院一品”建设课程第一阶段相关成果在课堂教学中的落实情况，包括课程思政的融入、效果及目标达成等。专项听课以跨学院交叉听课为主，优先安排同学部非本学院督导交叉听课，同学部无法覆盖或督导资源不足时，安排跨学部院督导听课作为补充。外语学院及英语学院因课程特性，由本学院督导开展听课工作。专项听课实行“一课两听、双督导”。每门列入专项听课范围的课程，须由2位不同督导分别听课1次，即每门课程至少完成2次专项听课；同一门课程的2次听课不得由同一督导承担。（2）常规听课学工部、体育部根据学校、院（部）本科教学工作目标，深入本院（部）课堂，开展常规督导听课，不参与课程思政专项听课工作。二、听课任务发布1.课程思政专项听课任务由学校统一在“本科教学质量管理平台”完成设定。2.常规听课任务需由学工部、体育部使用“本科教学质量管理平台”，于10月22日前完成任务设定。三、听课任务认领1.课程思政专项听课：请各学院本科教学督导在10月23日9:00前，在“本科教学质量管理平台”中一次性完成本学期听课任务认领。督导认领任务原则按每人每月听课1次，本学期累计听课3次，遵循“一课两听、双督导”要求，确保每门课程由2位不同督导分别认领，同一督导不得重复认领同一门课程。因专项听课的调研部分侧重考察课程思政建设成果在课堂中的落实情况，每门课程可听课时间由任课教师根据其课程思政融入情况提供，请学院教学秘书务必提醒督导关注所选课程的可听课时间，在任课教师可展示课程思政融入内容的时间进行听课。教师中心将于本通知发出后单独向各学院提供《课程思政专项听课任务清单》列明各学院听课任务及交叉听课安排，请各学院教学秘书将信息提供给督导进行听课任务认领参考。2.常规听课任务：与以往本科教学督导听课任务认领一致，随时听课随时认领。四、听课反馈1.听课完成后，督导应及时与任课"}, "portal_10092419685453824": {"notice_id": "portal_10092419685453824", "title": "关于本学期校内劳动教育系列实践课程开课的通知", "source": "后勤处", "category": "教务通知", "publish_time": "2026-10-16", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=10092419685453824", "deadline": "2026-10-19", "event_time": "", "summary": "全体在读学生可报名劳动教育实践课程，研究生10月19日截止", "content": "各位同学：由后勤处牵头组织的校内劳动教育系列实践课程自2024年开设以来，受到了同学们的热情关注和广泛支持。为深入学习贯彻习近平新时代中国特色社会主义思想，推进新时代立德树人工程，促进同学们德智体美劳全面发展，本学期后勤处联合教务处、博物馆、图书馆继续推出7个系列实践课程。具体安排如下：一、课程内容二、课程面向人员全体在读学生三、课程报名说明1.本科生可通过学校二三课堂“成长惠园”EA平台报名。具体报名开启时间为每次课程上课当周的周一12:00。2.研究生可通过扫描下方链接二维码进行选课报名，所有课程报名开启时间为10月19日12:00。课程容量有限，名额先到先得。报名成功的同学将在10月21日结束前收到点对点通知，若未接到通知则视为报名失败，不再另行通知。3.本科生培养方案实践教学环节中2学分劳动教育必修课，由8学时理论教育+24学时实践教育组成。本期7个系列实践课程属于24学时实践教育，非必选课程，24学时实践教育也可通过其他方式获得，具体见附件。4.请同学们仔细阅读课程内容，根据学习兴趣提前做好选课计划和时间安排。由于教学材料准备不易，为避免资源浪费，请报名成功的同学们准时参与学习，遵守课程纪律。如有其他疑问，可联系后勤处回老师：64492375。预祝大家在劳动实践中收获成长！附件：关于劳动教育学分要求的说明.docx后勤处、教务处、图书馆档案馆/校史馆/对外经贸博物馆2026年10月16日"}, "portal_10109871358119936": {"notice_id": "portal_10109871358119936", "title": "关于召开第106次校学位评定委员会会议的通知", "source": "研究生院", "category": "行政党务", "publish_time": "2026-10-16", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=10109871358119936", "deadline": "", "event_time": "2026-10-23", "summary": "通知校学位评定委员会委员参加10月23日会议，原则上不得请假", "content": "各位委员：兹定于2026年10月23日（周五）上午10：30在行政楼222室召开第106次校学位评定委员会会议。请各位参会委员做好时间安排，原则上不得请假，如确有冲突，请与学位评定委员会办公室联系（点击下载请假/委托书模板）。 研究生院学位办公室2026年10月16日"}, "93983756ae4a777747724b3267f07abb": {"notice_id": "93983756ae4a777747724b3267f07abb", "title": "【贸易强国  薪火相传 】我院组织学习习近平主席第140届广...", "source": "外语学院-学院动态", "category": "行政党务", "publish_time": "2026-10-16", "url": "https://sfs.uibe.edu.cn/ttxw/dce7d28b42044022aa0af46d98606286.htm", "deadline": "", "event_time": "", "summary": "外语学院组织师生学习习近平主席广交会贺信精神", "content": "【贸易强国薪火相传】我院组织学习习近平主席第140届广交会贺信\n发表时间：2026-10-16\n10月14日，国家主席习近平向第140届中国进出口商品交易会（广交会）致贺信。外语学院第一时间组织在校以及22位在广州参加第140届广交会翻译服务工作的师生，和历届广交会志愿者代表学习贺信，大家集中收看关于习近平主席向第140届中国进出口商品交易会致贺信等相关的新闻报道，围绕广交会创办70周年的时代意义、高水平对外开放使命开展学习研讨，引发热烈反响。\n大家认真研读贺信原文，深刻领会贺信中对广交会历史价值的高度评价。与会师生谈到，广交会创办70年来，作为中国扩大高水平对外开放、推动建设开放型世界经济的有效平台，见证中国对外开放不断向前的坚实步伐。贺信重申中国坚持扩大高水平对外开放、拓展国际经贸互利合作、推进普惠包容经济全球化的坚定立场，让大家倍感振奋、深受鼓舞。党委书记田文泉表示，广交会是鲜活的实践育人课堂，要持续引导青年学子立足专业所长，把个人成长融入国家对外开放事业。第136届广交会带队教师张一媛表示，广交会既是对外开放的窗口，也是青年成长的课堂，七十年来一届届学子在这里历练成长，这份传统值得继续守护与发扬。志愿者们结合翻译服务工作交流感悟，纷纷表示将牢记嘱托，以专业能力做好语言沟通、客商接待等志愿服务，当好中外交流的青年桥梁。\n自广交会创办以来，我校坚持组织师生参与广交会志愿服务，70年接续不断线，140届从未缺席。作为我校第一家北京市级校外人才培养基地，一代代外语学子接力奔赴广交会一线，以语言为桥，用专业服务助力中外经贸往来，在国家级对外开放平台上躬身实践、增长才干，把服务广交会打造为特色实践育人品牌。10月10日，我院专职辅导员高丽娜老师带领21名学生志愿者再次奔赴广交会开展翻译服务工作，接续传承跨越七十年的约定，在广交会的舞台上展现我校青年学子的专业素养与精神风貌。\n初心如炬，开放不息。习近平主席的贺信精神进一步凝聚外院师生奋进力量，下一步，我院将持续深化贺信精神学习贯彻，用好广交会这一思政实践大课堂，引导广大青年牢记时代使命，把学习成果转化为服务高水平对外开放的实际行动，在服务国家战略中锤炼本领、增长才干，用青春力量讲好中国开放故事，为拓展国际经贸互利合作贡献青年力量。\n【志愿者感想】\n作为第138届广交会志愿者，我在担任德语与英语口译时，亲身感受到了全球客商对“中国制造”的热情。总书记的贺信让我深感使命在肩。我将以此次志愿服务为起点，苦练语言本领，拓宽国际视野，努力成长为能讲好中国故事、服务高水平对外开放的复合型人才，贡献青春力量。\n——第138届广交会志愿者2023级德语专业本科生徐子涵\n研读总书记贺信，我备受鼓舞。作为第139届广交会志愿者，我深入商贸一线，依托语言优势服务了来自日本等各国的8位客商，搭建商务沟通纽带，展现了贸大外院学子风采。广交会让我直观感受到对外开放的活力。今后我会扎实打磨口译能力，坚守语言桥梁使命，讲好中国故事，以专业本领助力中外经贸往来。\n——第139届广交会志愿者2025级日语口译专业硕士研究生刘朝阳\n广交七秩，开放万里。习近平主席致第140届广交会贺信，重申中国扩大高水平开放、推进普惠包容经济全球化的坚定决心。学习贺信精神，我深受鼓舞，信念弥坚。作为第140届广交会的翻译服务人员，我将以字斟句酌的精准，让每一次沟通都顺畅高效；以一丝不苟的专业，让中国制造被更多客商看见；以真诚周到的服务，让普惠包容落到每一个展位；以文明互鉴的自觉，让广交会70年的开放故事传得更远。山海可渡，语言为桥。让我们将贺信精神化为实干，在开放中奋楫向前！\n——第140届广交会志愿者2024级阿拉伯语专业本科生任栩彤\n学习总书记致第140届广交会贺信，我深受鼓舞。作为第138届广交会志愿者，我在服务中外客商中感受到中国开放的活力与合作的温度。广交会联通世界，也激励我学好国贸和阿语，讲好中国故事，做中外经贸交流的青春桥梁，为高水平对外开放贡献绵力。\n——第138届广交会志愿者2023级阿拉伯语+国际经济与贸易双学士专业本科生胡怡航\n学习总书记致第140届广交会贺信，我深有感触。曾作为展位翻译服务广交会，在接待海外客商的过程中，我真切体会到广交会作为对外开放窗口的力量。外语是联通中外经贸的桥梁，亲眼见证各国客商交流洽谈，让我更加理解高水平对外开放的意义。我将深耕外语专业，锤炼跨文化沟通本领，努力讲好中国故事，为国际经贸合作贡献青春力量。\n——第138届广交会志愿者2023级俄语专业本科生潘伊莼\n我曾有幸担任第139届广交会的法语翻译，为机电制冷、银加工和玩具制造领域的企业服务。洽谈中，我见证中国制造的生命力与外商合作的热情。正如习近平主席指出，广交会是扩大高水平对外开放、推动开放型世界经济的有效平台。在外贸领域，翻译就是沟通之桥，是一切交易的根基。今后我将在精进法语水平的同时，更多了解产业相关知识，做中外经贸合作的青春纽带，为经济全球化贡献力量。\n——第139届广交会志愿者2023级法语专业本科生林安琪\n作为第139届广交会志愿者，细读总书记致第140届广交会的贺信，我感触很深。在上届广交会服务期间，我陪同意大利客商观展，并担任展位翻译，向来自全世界的客户推介国内产品，真切体会中国制造向中国智造转型的魅力。这段经历让我明白，外语学习者不能只局限语言，更要积累行业知识，当好中外沟通的桥梁。今后我会持续打磨本领，用专业能力助力中外经贸交流。\n——第139届广交会志愿者2023级意大利语专业本科生王小艺\n研读贺信，我对广交会“开放平台”的定位有了更深体会。走过70年，广交会见证中国持续扩大对外开放。作为展会翻译，我真切感受到语言是经贸沟通的桥梁。身处展会一线，我不仅要做好语言转换，更要当好中外交流的使者。我将珍惜这次实践机会，立足岗位，严谨细致地完成翻译工作，踏实做好服务，助力中外经贸往来，以专业能力服务互利合作，用青年行动践行普惠包容的经济全球化理念。\n——第140届广交会志愿者2023级西班牙语专业本科生梁瑶\n学习习近平总书记致第140届广交会的贺信后，我更加认识到广交会在促进中外贸易往来、推动高水平对外开放中的重要作用。作为对外经济贸易大学西班牙语专业的学生，我有幸参与本届广交会翻译工作，深感语言是连接不同国家、促进经贸合作的重要桥梁。今后，我将继续夯实西语基础，提升跨文化沟通能力，积极将专业知识与实践相结合，努力讲好中国故事，为促进中外交流与合作贡献自己的力量。\n——第140届广交会志愿者2024级西班牙语专业本科生许文强\n读到习近平主席向第140届广交会发来的贺信，我感到备受鼓舞、深感责任重大。正如习主席说到的，广交会创办70年来，已成为中国扩大高水平对外开放的重要平台。我作为一名来自对外经贸的学生，能以翻译服务志愿者的身份参与到这盛会中，备感荣幸。我们不仅是语言沟通的桥梁，更是展示中国开放与包容形象的窗口。在接下来的服务中，我将以精准、专业的翻译促进中外客商深入交流，用热情与真诚服务每一位海内外来宾，为保障全球产业链供应链畅通、推动开放型世界经济贡献青年力量！\n——第140届广交会志愿者2024级德语专业硕士研究生周逸婷\n作为广交会翻译服务志愿代表团的一员，学习习近平总书记的"}, "018e04b496b2526708ac0f78c17f7411": {"notice_id": "018e04b496b2526708ac0f78c17f7411", "title": "我校举办第十四届北京洪堡分论坛暨“新时代外语学科高质量发展”...", "source": "外语学院-学院动态", "category": "学术活动", "publish_time": "2026-10-16", "url": "https://sfs.uibe.edu.cn/ttxw/85dcbe39cb1b40a28a0e084b6ebf498a.htm", "deadline": "", "event_time": "2026-10-15", "summary": "我校举办外语学科高质量发展论坛，专家研讨学科建设与人才培养", "content": "我校举办第十四届北京洪堡分论坛暨“新时代外语学科高质量发展”论坛\n发表时间：2026-10-16\n10月15日，第十四届北京洪堡论坛分论坛“自主知识体系建构与数智范式革新——新时代外语学科高质量发展论坛”在对外经济贸易大学隆重举行。本次论坛由外语学院主办，来自北京外国语大学、清华大学、中国人民大学、南开大学、大连理工大学、四川外国语大学、北京语言大学、西安电子科技大学等高校及中国外文局翻译院、外研社等机构的专家学者齐聚一堂，围绕外语学科自主知识体系建设、数智时代学科转型与复合型外语人才培养等议题展开深入研讨。\n开幕式和主旨演讲环由外语学院院长李运博主持。对外经济贸易大学副校长曲雁在致辞中回顾了我校外语学科建设历程与发展特色，提出外语学科承担着融通中外的使命，如何建好自主知识体系、培育关键语种复合型拔尖创新人才、推进外语教育数字化转型、办好人民满意的教育，是外语教育工作者需要共同探讨的时代之问。文学部部长向明友介绍了学校外国语言文学学科的发展情况，感谢兄弟高校长期以来的大力支持。教育部高等学校外语教指委主任委员、北京外国语大学原副校长孙有中充分肯定了我校鲜明的商务外语特色及其对我国外语学科发展的积极贡献，评价我校外语学科是“历史久、语种多、特色足、实力强、影响大”。中国外文局翻译院院长黄玉龙结合自身在贸大的求学经历，从历史与现实视角阐释了世界百年未有之大变局的深刻内涵，强调新时代外语人才应具备扎实的语言能力、知识储备和国际传播能力，并主动适应数字化发展趋势。\n在主旨演讲环节，教育部高等学校外语教指委主任委员孙有中教授从建设成效、实践经验和未来举措三方面介绍了“三进”工作的推进情况，对外语专业自主知识体系的建构做了具体部署；教育部高等学校外语教指委英语分委员会主任委员、四川外国语大学原校长董洪川教授以“关于外语专业教育若干热点问题的思考”为题，提出了外语专业教育的五大时代价值和五大发展路径；教育部高等学校外语教委非通用语分委会主任委员、清华大学国际与地区研究院院长姜景奎教授以”非通用语教育与中国自主知识体系构建“为题，从学科发展的历史脉络出发，探讨了中国外语学科自主知识体系的建构路径；教育部高等学校外语教指委阿拉伯语分委会主任委员、北京语言大学外国语言文化学院院长罗林教授围绕“十五五”规划纲要涉外领域与具体政策表述，梳理了区域国别研究人才培养的现状，并分析了未来发展方向。\n圆桌论坛由外语学院副院长黄慧主持。四所“双一流”高校的外国语学院院长结合各自办学特色，分享了外语学科人才培养与专业建设的实践经验。其中，中国人民大学陈方教授围绕“‘外语+’复合性拔尖创新人才培养体系”，介绍了通过“一核两翼”布局、“外语+”与“+外语”双路径构建国际胜任力培养体系的探索；南开大学阎国栋教授强调综合性大学应发挥其自身学科综合性优势，推动学科交叉融合，服务国家高水平对外开放需求；大连理工大学孙成志教授提出外语学科应主动融入大学创新体系，构建“专业+外语+全球胜任力”培养模式，实现科技与人文双向赋能；西安电子科技大学陈会林教授结合日语专业建设实践，介绍了语言学与人工智能融合、语言智能课程建设及垂直领域大模型应用等探索。\n闭幕式上，外语学院院长李运博作总结发言。他表示，外语学科高质量发展既需要传承既有办学经验，也需要主动回应时代变化，期待各高校进一步加强交流合作，共同探索外语学科创新发展的新路径。\n本次论坛作为第十四届北京洪堡论坛的重要组成部分，搭建了外语学科建设与人才培养经验交流的平台，汇聚了不同高校的学术智慧与实践成果，为新时代外语学科自主知识体系建设、数智化转型和复合型国际化人才培养提供了有益借鉴。"}, "16268ec7a3739fd551b92cbbb62835c2": {"notice_id": "16268ec7a3739fd551b92cbbb62835c2", "title": "我校举办2026级港澳台新生见面会", "source": "国际合作交流处-新闻动态", "category": "其他", "publish_time": "2026-10-16", "url": "http://international.uibe.edu.cn/xwbd/3be604b2895546fd8e361768e0f6a26c.htm", "deadline": "", "event_time": "2026-10-15", "summary": "港澳台办举办2026级港澳台新生见面会，分享经验并宣讲政策", "content": "（港澳台办供稿）2026年10月15日14:30，我校2026级港澳台新生见面会在诚信楼331举行。来自港澳台地区的40余名本科、研究生新生参加活动。见面会由港澳台办武老师主持。\n朋辈引领，助力新生融入校园。\n活动伊始，3位优秀港澳台学生骨干余承骏、余佳蔓、黄思蕾结合自身在校学习和生活经历，围绕校园适应、学业规划、校内资源利用、人际交往及考研准备等方面分享经验与心得，为新生提供了实用的学习生活建议，帮助大家进一步了解校园环境、熟悉学校资源，为开启大学生活做好准备。\n优秀港澳台学生骨干分享学习与生活经验\n随后，活动进入破冰交流环节。新生们依次进行自我介绍，分享个人兴趣爱好、成长经历与求学感悟，在轻松愉快的氛围中增进了解、拉近距离。通过交流，同学们不仅加深了彼此的认识，也有机会结识志趣相投的伙伴，为更好地融入贸大校园、开启丰富多彩的大学生活奠定了良好基础。\n政策解读，做实学生服务保障。\n在政策宣讲环节，港澳台办老师围绕办公室主要工作职责，介绍了学校涉港澳台事务统筹、港澳台地区交流合作、国情教育、学生培养与服务保障等相关工作，并就港澳台学生交流交换项目进行了说明，帮助新生进一步了解学校面向港澳台学生的培养支持体系及相关资源。\n在国情教育方面，老师重点介绍了港澳台学生国情教育课程与思政课学分替换的相关政策、申请流程及国情教育网络培训要求，并对学校开展的国情教育实践活动进行了介绍。相关活动形式丰富、内容多样，涵盖“美育+体育”戏剧与乒乓课程、故宫参观、非遗手工体验、中华文化知识大赛、国际文化节港澳台特色展位以及赴外地研习交流等，旨在引导学生在实践体验中增进对国家历史、文化与发展的了解，深化对中华优秀传统文化的认识。\n在学习生活服务方面，武老师围绕新生普遍关注的问题进行了细致讲解，涵盖医保参保、证件遗失与补办、学籍注册、课程选修及学分要求等内容，并介绍了数理课程学习支持、校内咨询渠道及相关帮扶资源，为新生顺利开展学业、适应校园生活提供指引。同时，老师介绍了综合奖学金、教育部港澳台学生奖学金、黄廷方奖学金、太古内地高校奖学金等相关奖助项目，鼓励同学们主动了解政策、积极申请符合条件的奖助学金，充分利用学校提供的各类资源。此外，老师还鼓励新生积极参与校内社团及各类学生活动，在交流互动中拓展视野、提升能力、增进友谊。\n宣讲最后，武老师勉励全体新生珍惜在贸大的学习时光，主动适应校园，积极参与学校各项活动，充分利用学校平台与资源，在新的求学阶段锤炼本领、增长才干，书写充实而精彩的大学篇章。\n活动尾声，武老师代表港澳台办为2026级港澳台新生发放新生纪念品，全体师生合影留念。\n2026级港澳台新生见面会全体师生合影\n本次见面会是学校做好港澳台新生入学教育与服务保障工作的重要举措，通过朋辈经验分享、互动交流与政策宣讲相结合的形式，帮助新生增进对学校的了解，熟悉相关政策与服务资源，增强归属感与认同感，为新生尽快融入贸大校园、开启新的学习生活提供了有力支持。"}, "aaa03f584aae465d77ad7c536138123c": {"notice_id": "aaa03f584aae465d77ad7c536138123c", "title": "2026年下半年学位答辩及论文提交注意事项", "source": "研究生院-学位与学科", "category": "教务通知", "publish_time": "2026-10-16", "url": "http://yjsy.uibe.edu.cn/cms/infoSingleArticle.do?articleId=7934&columnId=2064", "deadline": "2026-11-30", "event_time": "", "summary": "学位申请人须于11月30日前上传论文定稿并完成答辩等环节", "content": "各学位申请人：\n2026年下半年研究生答辩即将启动，学位论文交存出现新变化，现就有关事项通知如下：\n一、系统查阅\n论文评阅结果、学院答辩安排和答辩结果会随时在“研究生综合管理信息系统”（点击查阅，下同）更新，请随时关注通知并及时查看。\n二、答辩及论文修改\n（一）答辩安排\n2026年下半年答辩时间大致安排在10月中下旬至11月中下旬，具体日期由各学院自行安排。\n答辩前，学位申请人应根据《对外经济贸易大学在学位论文和毕业论文（设计）中规范使用人工智能技术的指导意见（试行）》提交《人工智能技术使用声明》。学位申请人还应提交《博士/硕士学位论文答辩导师意见书》，学位论文经导师审查同意后，方能参加答辩。此外，双盲送审的学位申请人应等待评阅结果，通过后才能参加答辩。\n（二）答辩材料\n学院统一领取硕士答辩材料。双盲结果通过后，研究生院学位办组织发放博士答辩材料（请关注双盲结果公示通知）。\n（三）答辩要求\n答辩人应到现场答辩，使用PPT，完整介绍学位论文基本情况，制作好的PPT应在答辩前提交给答辩秘书或学院教务员。\n学位论文在答辩前送答辩委员会组成人员审阅，评阅意见是答辩评议的重要参考材料。\n在双盲评审中被预警的博士生，应在答辩现场向答辩委员会陈述学位论文修改情况。\n（四）答辩后学位论文修改\n答辩委员会认为学位论文虽能通过答辩，但在学位审议前应做必要修改的，答辩人应完成“学位论文答辩后修改”环节，详见关于进一步推进研究生学位论文答辩后修改工作的通知。\n答辩虽通过但答辩平均成绩不足70分的，或答辩委员会认为论文应做重大修改的，进入答辩后修改鉴定程序。对于鉴定不合格的论文，将在学位评定分委员会上通报审查。\n进入答辩后修改鉴定程序的学位申请人，应填写归档《研究生学位论文答辩后修改鉴定表》，答辩材料袋中《研究生学位论文答辩后修改反馈情况表》作废。\n未进入鉴定程序的学位申请人，在答辩后学位论文修改后，填写归档答辩材料袋中的《研究生学位论文答辩后修改反馈情况表》。\n三、格式规范性检测\n学位申请人在答辩结束后、提交学位论文定稿之前，应完成学位论文格式规范性检测，具体检测时间由学院自行安排，详见关于开展研究生学位论文格式规范性检测的通知（点击查看）。\n检测结果将作为学位论文形式审查重要依据，请认真对待检测结果，确保论文写作规范性。学位论文格式规范性检测以差错率低于万分之三为合格标准，对于最终检测不合格的学位论文，学院学位评定分委员会将重点审查。\n四、博士申请学位学术成果提交\n在学位评定分委员会前，按照学院规定时间，博士学位申请人应完成申请博士学位学术成果的系统填报和纸质材料提交，具体填报和提交要求参见“博士科研成果系统填报和纸质材料提交要求”。\n对于不用于博士学位申请的学术成果，如博士学位申请人不愿公示，可向学院教务员提出申请，由学院教务员在审核博士学位申请学术成果达标的前提下，对系统导出的《申请博士学位学术成果审核表》/《外经贸往年两证分离博士生学位审议申请表》进行删减操作后报送研究生院，但应保留符合博士学位申请的学术成果。\n五、学位评定分委员会\n对于“双盲评审受到质量预警”“答辩非全票通过”“答辩后修改鉴定”“往年两证分离”“分委员会二次审议”五种情况的博士论文，学位申请人应在学院学位评定分委员会上到场陈述或提交详细修改说明。\n对于答辩后修改鉴定不合格的论文，学位评定分委员会将单独审议。\n六、学位论文定稿提交\n（一）论文打印装订\n学位论文经导师同意定稿后，可以进行打印与装订。如有对论文封面颜色、写作格式不明确之处，可点击查看《研究生学位论文写作规范》。中国学生论文定稿封面的姓名、导师、专业、题目等信息应与学位信息采集完全一致，留学生论文定稿封面的上述信息应与国际学院上报学信网的学位信息完全一致，包括中英文、大小写等。\n（二）论文提交\n纸质版定稿：答辩结束或答辩修改鉴定后一周内，博士学位申请人应向学院提交1份学位论文定稿纸质版，硕士学位申请人无须提交纸质版论文，学院另有份数及报送要求的以学院规定为准。提交时应保证论文封皮颜色、内容格式符合《研究生学位论文写作规范》，导师和学生本人签字情况完备，不合格的论文不予接收。\n电子版定稿：学位申请人应上传至“研究生综合管理信息系统”（见图示）。定稿上传功能将于11月开放。点击“修改”按钮后才可上传。定稿截止上传时间为11月30日。\n \n电子版定稿提交PDF文档，全文，无须匿名，封面请勿使用打印版彩页。上传论文应以“学号_姓名_定稿”命名，如“20230000001_张三_定稿”。同等学力人员“学号”对应资审通过“T”开头的学位编号，上传论文文档命名如“T20240001_李四_定稿”。\n（三）学位论文交存和抽检\n学位授予后，电子版定稿将按照上级要求，上报全国博士硕士学位论文（实践成果）管理平台、交存有关图书馆，并直接接受教育部学位论文抽检。\n学位申请人应确保电子版定稿为学位论文最终版，论文内容和签名信息完整无误，不得出现上传文本错误、内容不完整、图表不显示、论文乱码、扫描变形、无关水印或标记、擅自加密等问题，并在学位信息采集时务必确保填报论文题目与上传的定稿封面题目完全一致。\n请认真核对并规范提交个人学位论文的全部材料，确保信息真实准确，以保障论文得到客观公正的评审。\n七、相似性终检\n12月上旬，学校将对学位论文定稿集中进行相似性终检，若提交文本错误，可能导致检测不通过。\n相似性终检为答辩后检测，合格标准及不合格处理详见《对外经济贸易大学学位论文学术不端行为检测及处理办法》第九条、第十条。\n八、重点学科论文审议\n对于“双盲评审受到质量预警”“答辩时非全票通过”“答辩后重大修改”“往届双证分离”“分委员会二次审议”五种情况的应用经济学学科博士学位论文，经济学部论文质量督导专家组将于12月中上旬进行重点审议。专家组认为需做重大修改的论文，将提请校学位评定委员会决定是否暂缓学位授予。\n \n \n \n研究生院学位办公室\n2026年10月16日"}, "portal_9616506128601088": {"notice_id": "portal_9616506128601088", "title": "【银发风采】银发丹心永向党 红色宣讲传薪火——记开国上将陈士榘之子、中华英烈褒扬事业促进会理事、“薪火”红色宣讲团导师 陈人康", "source": "离退休人员工作处", "category": "行政党务", "publish_time": "2026-10-15", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=9616506128601088", "deadline": "", "event_time": "", "summary": "报道退休干部陈人康开展红色宣讲事迹，无学生任务", "content": "他七十四岁，鬓发如雪，一年有大半年奔走在路上，他让十万工程兵为两弹“做窝”的故事传遍大江南北。他叫陈人康，是开国上将陈士榘的第四子，目前担任中华英烈褒扬事业促进会理事、“薪火”红色宣讲团导师，也是对外经济贸易大学一名普通的退休干部、一名“红色宣讲达人”。半辈子军营，半辈子校园1968年，十六岁的陈人康成为家里的第三代工程兵，担负国防工程施工搅拌砂浆、挑水泥，一挑一整天。1970年，云南通海大地震，他随部队冲进救灾一线，因表现突出，十八岁入党，连年被评为“五好战士”，后就读于南开大学哲学系和中国社会科学院研究生院，1985年转业到对外经济贸易大学，2012年退休。从部队到学校是他的主动选择：响应国家号召转业，更源于父亲一生的“教育情结”——1928年井冈山时期，陈士榘在毛泽东同志领导建立的第一个“红军教导队”中担任教官和区队长，此后历任红军随营学校校长、华东军政大学副校长、南京军事学院教育长。陈人康说：“我这一辈子跟父亲一样，半辈子从军，半辈子教育。”井冈山的召唤陈人康说：“父亲感到最荣耀的两件事都发生在井冈山：1927年随秋收起义部队到达井冈山参加了著名的三湾改编，之后在水口镇由毛泽东同志亲自发展为中共党员，同年又在井冈山第一个县级工农兵政权中当选士兵代表县常委之一。这份&lsquo;井冈山情结&rsquo;深深种进了我的心里。”2007年，陈人康应邀参加井冈山革命根据地创建80周年纪念活动，主办方邀请红军后代座谈，他由此与江西省委组织部培训中心（现江西省委党校江西干部学院）结缘，共同酝酿以“井冈山精神代代相传——追忆前辈的人生坐标”为主题的党史学习教育大讲堂，并于2009年正式开讲。2012年退休后，他把红色宣讲从“业余”做成了主业：宣讲团定期聚在一起集体备课，还立有“三个不讲，六项注意”的讲课纪律；宣讲团成员从最初的3位红军后代发展到60人左右；内容也从单一的井冈山精神，扩大到井冈山、长征、抗战、隐蔽战线、“两弹一星”等各个时期的红色精神。退休前，他利用寒暑假到井冈山，一讲就是半个月；退休后更“收不住脚”，最忙时一年往井冈山跑三四趟，从三月讲到十一月。十余年间，仅在井冈山的讲座就有数百场。讲故事，不讲大道理陈人康的足迹遍及大江南北，高校、机关、部队和社区都留下过他的声音。他撰写《一生紧随毛泽东——回忆我的父亲陈士榘》一书，把尘封的家国记忆送到读者手中。作为贸大“五老”宣讲团成员，他说在"}, "portal_9680360474140672": {"notice_id": "portal_9680360474140672", "title": "我校国情教育海南分团教师抵达海南开展实践活动", "source": "海南研究院", "category": "行政党务", "publish_time": "2026-10-15", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=9680360474140672", "deadline": "", "event_time": "2026-10-14", "summary": "我校7名青年教师赴海南开展为期6周国情教育实践活动", "content": "2026年10月14日，我校4名青年教师来到海南经贸职业大学调研交流，开展为期6周的课程教学、课题研究、岗位实践等国情教育实践活动。海南经贸职业大学校领导李厚永热情接待来访人员并出席座谈会。李厚永对我校青年教师一行的到来表示热烈欢迎。他说，两校具备良好的合作基础，希望以本次国情教育实践活动为契机，搭建更加紧密的交流平台，依托贸大优质学科资源与我校职业教育办学特色，在师资共培、课程共建、科研协同等方面深挖合作潜力，推动理论研究与职业教学实践深度融合，共同为海南自贸港建设培育高素质技术技能人才。座谈会上，双方围绕落实两校战略合作协议、加强师资队伍建设等内容进行了深入交流。双方一致认为，两校合作基础扎实，将持续加强常态化沟通对接，不断拓宽、深化合作领域，凝聚育人合力，携手实现资源共享、优势互补、共同发展。我校海南研究院、海经贸组织人事处、信息技术中心、继续教育学院相关负责人参加座谈。我校2026年海南国情教育分团共有7名教师，分别赴海南经贸职业大学和海南外国语职业学院，开展为期六周的国情教育活动，主要从事课题研究、举办学术讲座、开展实地调研和授课等活动。据悉，这是我校海南研究院连续8年协助学校人力资源处组织青年教师海南国情教育活动，累计接收76位青年教师来海南开展实践活动。以实际行动服务海南自贸港建设，体现贸大青春担当。"}, "portal_9691003566678016": {"notice_id": "portal_9691003566678016", "title": "国际学院直属党支部赴喇叭沟门满族乡开展主题党日活动", "source": "国际学院", "category": "行政党务", "publish_time": "2026-10-15", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=9691003566678016", "deadline": "", "event_time": "2026-10-10", "summary": "国际学院党支部赴喇叭沟门乡开展主题党日活动", "content": "为进一步夯实树立和践行正确政绩观学习教育成效，推动高质量党建引领来华留学教育高质量发展，10月10日，国际学院直属党支部赴喇叭沟门满族乡开展主题党日活动。全体党员先后参观了喇叭沟门满族乡对角沟门村、中榆树店村和帽山村，了解对角沟门村如何凝聚并盘活村内闲置农宅资源，发展各具特色的民俗、民宿产业，成立旅游专业合作社，实现集体增收。在中榆树店村党支部“草帽书记”彭兴利的讲解下，知晓了如何通过科学种植和生态养殖逐步推动改善民生和新村建设，建成了远近闻名的新农村、文明村和小康村。通过参观帽山村，掌握当地以打造“北极村”文旅IP为抓手、古油松为核心、融汇星空生态与满乡风情，建成北京北部新晋特色文旅打卡地，引领当地文旅发展。随后，双方围绕“来华留学生国情实践教育及赋能国际传播、讲好中国故事”主题举行座谈会，国际学院直属党支部书记耿慧芳、喇叭沟门满族乡党委书记郭顺才等相关同志参加座谈和交流，双方表示，将继续发挥喇叭沟门满族乡作为“对外经济贸易大学来华留学生国情实践教育基地”的平台作用，以高质量党建引领、深化协同育人和实践教学的常态化合作机制，双方共同推动校地在来华留学生感知中国乡村发展、强化对外宣传方面的活动和建设成效。国际学院直属党支部将继续推动理论学习与来华留学教育实践工作紧密结合，以创新理念、高质量发展理念引领来华留学事业高质量发展，进一步将党建工作动力转化为实践工作动能。"}, "portal_10067939399471104": {"notice_id": "portal_10067939399471104", "title": "巴西里约热内卢天主教大学国际关系研究所师生代表团到访国际关系学院开展学术交流", "source": "国际关系学院", "category": "国际交流", "publish_time": "2026-10-15", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=10067939399471104", "deadline": "", "event_time": "2026-09-17", "summary": "巴西高校代表团到访国际关系学院开展学术交流活动", "content": "2026年9月17日上午，巴西里约热内卢天主教大学（PUC-Rio）国际关系研究所师生代表团一行27人到访国际关系学院，开展专题讲座、座谈研讨、师生交流等系列学术交流活动。本次代表团由该校国际合作中心主任卡洛斯·弗雷德里科·科埃略（CarlosFredericoCoelho）教授与金砖政策中心副主任玛丽亚·埃莱娜·罗德里格斯（Mar&iacute;aElenaRodr&iacute;guez）教授带队，成员涵盖该所本科及硕士研究生。图1：国际关系学院刘若楠教授为巴西里约热内卢天主教大学代表团作专题讲座活动伊始，我校国际关系学院刘若楠教授为巴西师生作题为《当代中国外交政策》的专题英文讲座。讲座立足多维视角，系统阐释了新时代中国外交理念与实践路径，获得来访师生的高度认可。讲座中，刘若楠教授梳理了中国综合实力的发展脉络，阐释了中国对外战略的目标体系与国际秩序核心主张，详细解读了我国坚持维护以联合国为核心的国际体系和建设平等有序的多极世界的外交基本立场，全面介绍了全球发展倡议、全球安全倡议、全球文明倡议、全球治理倡议的提出背景、核心内涵与实践价值。最后，刘若楠教授聚焦中美关系发展现状，深入剖析双边关系的基本框架与深层结构性影响因素。讲座尾声，巴西师生围绕全球南方、中美元首会晤等国际热点问题积极提问，刘若楠教授逐一细致解答，现场学术交流氛围浓厚热烈。图2：我校国际关系学院教师与巴西代表团教授举行座谈专题讲座结束后，两校师生开展专项座谈交流。我校国际关系学院刘若楠、王海滨、赵丹阳、郑执浩、赵宇辰五位教师与巴方两位带队教授，围绕国际关系学科建设、师生双向交流、国际联合科研等核心合作议题深入交换意见、共探合作路径。座谈期间，科埃略教授详细介绍了里约热内卢天主教大学国际关系研究所IRIGlobal海外研修项目的运行模式、培养体系与实施机制。双方充分肯定了彼此学科办学特色与科研优势，围绕拓展常态化师生互访、搭建学术交流平台、推进跨国别联合研究等合作方向展开深入探讨，为后续深化务实合作奠定了良好基础。与此同时，国际关系学院学生与巴西来访学生开展自由交流，双方畅聊学术学习、校园生活与中外文化，搭建起青年沟通的友好桥梁。本次交流活动中，两校师生还围绕国际关系专业学习、学术研究以及中巴青年交流等话题进行了深入沟通。巴西师生对我校国际关系学院的学科建设、人才培养和国际交流情况表现出浓厚兴趣，双方进一步增进了相互了解。里"}, "portal_10068257474514944": {"notice_id": "portal_10068257474514944", "title": "第十三期“贸大卓越博士研究生国际学术论坛”（国际问题专场）顺利举行", "source": "国际关系学院", "category": "学术活动", "publish_time": "2026-10-15", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=10068257474514944", "deadline": "", "event_time": "2026-09-19", "summary": "贸大卓越博士生国际学术论坛国际问题专场于9月19日举行", "content": "2026年9月19日，第十三期“贸大卓越博士研究生国际学术论坛”（国际问题专场）在对外经济贸易大学国际交流大厦203室顺利举行。本次论坛由对外经济贸易大学国际关系学院、党委研究生工作部及研究生院联合主办。对外经济贸易大学研究生院副院长李岩出席论坛。国际关系学院王宏禹教授主持论坛并致欢迎辞。论坛邀请意大利米兰圣心天主教大学马丁·克莱因（MartinKlein）教授、德国萨克森应用警察科学大学克里斯托夫·迈塞尔巴赫（ChristophMeisselbach）高级研究员两位海外学者，与国际关系学院严展宇副教授、谈玉衡博士共同组成点评专家组，对博士生的汇报展开逐一点评。本次论坛采用英文进行汇报和交流，博士生的选题共同指向国际秩序调整这一现实背景。论坛聚焦大国关系、地区冲突、经济安全与科技安全、能源与气候治理、全球发展合作及国际制度变革等重要议题，设置博士生学术汇报与专家深度点评环节，旨在深化跨区域、跨学科对话，拓展博士生的国际学术视野，提升其研究水平与学术表达能力。来自国际关系学院的博士生围绕全球治理、发展权、关键矿产与绿色产业政策等前沿议题分享最新研究成果，展现了扎实的学术训练与开阔的问题意识。在学术汇报环节，博士生程玲以“全球南方参与全球治理的演进、路径与动力分析”为题，从冲突斡旋、联合国维和贡献与多边机制改革三条路径，阐释全球南方由规则接受者向规则共建者的角色跃升；博士生亚当（AdamsPhilipDuwai）以“发展权与南南合作：在全球发展治理中落实人权框架”为题，基于三组南南合作案例比较，倡导构建去殖民化、可问责、兼顾不对称性的结构性南南合作。博士生阿迪（AditRastogi）以“超越矿山：电动汽车电池供应链、战略依赖与不均衡的绿色工业化”为题，依托关键矿产与电池产业数据及典型案例，提出绿色转型本质是产业链控制权的重新博弈，而非单纯产能转移；博士生夏冬以“官僚角色与绿色产业政策：德国与美国电动汽车部门中的国家干预”为题，引入协调结构、规制权威层级变量，解释德美两国电动车产业政策呈现渐进加码与反复摇摆差异化轨迹的制度成因。点评环节中，马丁·克莱因教授、克里斯托夫·迈塞尔巴赫高级研究员、王宏禹教授、严展宇副教授、谈玉衡博士对博士生的汇报逐一进行深度点评，充分肯定了研究选题的前沿性与研究设计的创新意识，并从理论框架凝练、概念界定与因果机制识别、案例与数据选取、比较方法"}, "portal_9590922054197248": {"notice_id": "portal_9590922054197248", "title": "关于开展第十五期学生线上心理健康知识MOOC培训的通知", "source": "学工部", "category": "其他", "publish_time": "2026-10-15", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=9590922054197248", "deadline": "2026-10-23", "event_time": "", "summary": "2026级心理委员须参加线上心理健康MOOC培训，10月23日前上报名单", "content": "各学院、各位同学：为提升学生心理素养，加快推进我校心理育人平台建设，提高我校学生心理委员自身心理健康意识，提高学院、班级和宿舍心理委员（宿舍长）的工作能力，鼓励同学们关注自身心理健康，提升自助助人能力，现开启本学期线上心理健康知识MOOC培训工作。心理委员MOOC培训认证是中国心理学会心理学标准与服务研究委员会、全国高校心理委员研究协作组共同打造，组织国内高校心理中心老师录制，在高校心理委员工作平台发布。心理委员MOOC培训为我校初阶-进阶-高阶三阶培训中的初阶培训。我校自2019年起推进学生心理委员持证上岗，心理委员通过参加培训，发挥自身在朋辈心理工作中的重要作用。具体培训事宜通知如下：1.培训对象：（1）2026级全体本科生和研究生校级、院级、班级和宿舍四级心理委员必须参加；（2）其他感兴趣的同学可自愿注册学习。2.培训时间：即日起至2026年12月8日期间完成。3.报名方式：（1）请各学院于10月23日24点前统一上报名单，院级心理委员负责人报送2026级本科生三级心理委员名单至huixincz@126.com；2026级研究生心理委员和宿舍心理委员名单报送ygb@uibe.edu.cn（汇总表具体见附件1）；（2）请所有参与本期培训的本科生需于10月16日-10月20日期间在EA平台报名，详见“惠心成长服务站”公众号推送。https://ea.uibe.edu.cn/Index/Class/view/aid/eYv9IHEcjEE.html4.培训形式：微信搜索“高校心理委员工作平台”，在子菜单毫末平台上完成线上心理委员认证课程（具体操作流程详见公众号推送）。自行注册后方可开始学习，无后续通知。5.考核方式：需完成线上14个专题培训视频学习后，完成课后专题的题目测试，14个专题共设定50道测试题。完成测试达80分以上（含80分）的本科生，可获得二三课堂EA平台-校园文化平台认定0.4学分。（无需提交学习结果，等待认定后进行评价）。6.证书获取：学生工作部心理健康教育中心和研究生工作部会根据各学院上报名单中测试通过的2026级心理委员统一付费，需通过后自行申领，同学无需单独付费领取。EA平台学分认定仅需通过测试即可。自愿注册学习的同学如需获取证书，需学生自行承担相关费用（电子版证书10元）。序号内容（每个专题视频约20min）专题1心理委员的工作职责与角色定位"}, "ba21a5d6ad740dee0e49cc0ba8ebe9d5": {"notice_id": "ba21a5d6ad740dee0e49cc0ba8ebe9d5", "title": "三名北大、超三分之一进入985高校！外语学院 2023级保研...", "source": "外语学院-学院动态", "category": "其他", "publish_time": "2026-10-15", "url": "https://sfs.uibe.edu.cn/ttxw/b56ff814c2d5407296d7cce0885dffc5.htm", "deadline": "", "event_time": "", "summary": "外语学院2023级保研录取结果公布，43人被名校录取", "content": "三名北大、超三分之一进入985高校！外语学院2023级保研取得骄人成绩\n发表时间：2026-10-15\n近日，全国推荐免试研究生录取结果陆续揭晓，外语学院2023级本科学子再创佳绩，共43名学生被国内知名高校录取。顶尖院校录取实现标志性突破，复合型人才培养成果丰硕，非通用语种办学特色持续彰显，充分展现了学院国际化复合型涉外人才培养的扎实成效。\n录取院校统计\n一、实力卓著：顶尖院校录取持续突破育人质量广受认可\n本届保研升学学子表现亮眼：3名同学成功保送北京大学，创下学院近年顶尖院校升学的标志性成绩；北京大学、复旦大学、浙江大学、中国人民大学等10所985工程高校合计录取15人，占保研总人数近35%；国家“双一流”建设高校共录取42人，覆盖率近100%。整体升学层级稳居国内同类院校前列，人才培养质量得到国内顶尖高校的广泛认可与高度评价。\n二、模式创优：首届双学士培养落地见效复合创新成果突出\n2023级是学院“国际经济与贸易+外语”双学士学位培养项目的首届毕业生，保研的12名双学位专业学生全部实现高质量升学，其中多名学子保送至复旦大学、浙江大学、中国人民大学等985高校国际商务、金融等热门优势专业。首届培养周期即交出优异答卷，充分验证了“外语功底+经贸能力”双轨培养模式的复合竞争力，标志着学院国际化、高水平、复合型涉外人才培养改革取得重要阶段性成果。\n三、特色凸显：非通用语种优势不断彰显精准对接国家战略\n学院非通用语种人才培养特色鲜明，升学表现多点开花：德语、意大利语、越南语、波斯语等非通用语种保持强劲竞争力，获得北京大学等顶尖院校青睐，区域国别语言人才特色突出；同时，学生升学路径覆盖外国语言文学、国际商务、涉外法治、国际金融、国际关系、国际中文教育等多个领域，在国家紧缺的全球治理、区域国别研究、国际发展合作等赛道持续突破，人才培养深度对接国家对外开放战略与涉外人才需求。\n这份优异成绩的取得，离不开社会各界的关心支持，更离不开全院教职员工深耕教学、潜心育人的辛勤付出，以及全体学子笃行不怠、锐意进取的拼搏奋斗。未来，外语学院将继续坚守育人初心，锚定国家战略需求，深化“外语+”复合型人才培养改革，持续提升办学质量与育人水平，助力学校事业高质量发展，为国家高水平对外开放事业输送更多高素质涉外人才。"}, "bdf3eb1ad4525eb4239be616542f2836": {"notice_id": "bdf3eb1ad4525eb4239be616542f2836", "title": "关于组织参加“智库建设与咨政报告写作”专题交流会的通知", "source": "科研处-通知公告", "category": "学术活动", "publish_time": "2026-10-15", "url": "http://kyc.uibe.edu.cn/tzgg/a154d9f6665d4dfca23cafa34ed4eb42.htm", "deadline": "2026-10-23", "event_time": "2026-10-30", "summary": "教师报名参加智库建设与咨政报告写作交流会，10月23日截止", "content": "各相关学院、各位老师：\n为进一步发挥高校智库功能，畅通决策咨询成果报送渠道，提升我校教师服务国家战略和首都发展的咨政建言能力，学校拟组织“智库建设与咨政报告写作”专题交流会。会议将邀请科技日报社理论评论部专家，与校内相关教师开展面对面座谈交流。\n现将有关事项通知如下：\n一、会议主题\n智库建设与咨政报告写作\n二、会议时间\n2026年10月30日（星期五）上午9:00-11:30\n三、会议地点\n行政楼222会议室\n四、参会人员\n相关学院有咨政报告写作意向，或研究方向涉及相关现实议题，希望将学术成果转化为决策建议的教师。\n五、参会要求\n因交流内容涉及内部信息，请勿拍照、录音、录像。参会人员须在进入会场前将手机统一交工作人员集中保管，会议结束后领回。请提前安排好个人事务，会议期间不得使用手机。\n六、参会组织\n请各单位积极做好通知转发，组织有意参会的教师扫描下方二维码报名，报名截止时间2026年10月23日（星期五）17:00。\n本次会议因名额有限，实行扫码报名、凭报名信息入场参会。请各位老师知悉。欢迎有意向的教师参会！\n联系人：郭宇嘉\n联系电话：64494549\n科研处\n2026年10月15日"}, "83aced04b6e65589003528035fd0b926": {"notice_id": "83aced04b6e65589003528035fd0b926", "title": "2026年下半年博士、同等学力硕士双盲评审结果公布", "source": "研究生院-学位与学科", "category": "教务通知", "publish_time": "2026-10-15", "url": "http://yjsy.uibe.edu.cn/cms/infoSingleArticle.do?articleId=7932&columnId=2064", "deadline": "", "event_time": "", "summary": "博士及同等学力硕士双盲评审结果公布，需登录系统查看并按要求办理答辩手续", "content": "根据本学期申请学位工作安排，博士、同等学力硕士双盲评审结果现已陆续返回，现做说明如下：\n一、双盲评审结果查询\n论文评阅结果在研究生综合管理信息系统（点击登录）中公布，系统查看位置见下图。学位办依据最新结果做不定期更新，请登录系统及时查看。双盲结果如未返回，请耐心等待。\n \n请参加双盲的同学主动联系学院教务员获取双盲评阅书电子版。论文评阅结果为“允许答辩”者取得评阅书电子版后，请打印放入答辩材料袋中归档。评阅书电子版将统一发放至各学院，与评审结果同步更新，以“10036_学号（或学位申请编号）”命名。\n二、博士双盲评审结果\n（一）根据《对外经济贸易大学博士学位论文双盲评审办法》,博士双盲评审的返回结果以ABC表示对论文的评价，每篇论文送3位评审专家，若其中有1个C，则再送2位专家。\n（二）双盲评审结果仅是学位论文质量的参考，不代表能够通过答辩并获得博士学位。允许答辩的博士生仍然需要认真修改论文，进一步提高论文质量。在双盲评审中虽获通过，但“无专家给出A类评价”、“1位专家给出C类评价”及两者兼有的学位论文视为质量隐患论文。对质量隐患论文，学位办将通过i惠园一站式办事大厅向学院、导师、学生线上发放《博士学位论文双盲评审结果预警及责任告知书》，请学院主管领导及教务员、导师、学生关注，及时签收（签收流程见附件1）。校外导师博士和留学生博士，师生无法线上签收，均需线下预警，请学院教务员根据博士双盲结果，及时做好《博士学位论文双盲评审结果预警及责任告知书》（附件2）的制作、发放和留存。\n被预警的博士生应向答辩委员会、学位评定分委员会进行修改汇报，学校在学位授予后将重点抽检。\n（三）通过双盲且导师同意答辩的博士生，在答辩公告发布后，学院教务员或答辩秘书可于工作日8：30-11：30、13：30-16：00到诚信楼811室领取答辩材料，需报送学院主管领导签字盖章的《博士答辩资格审核确认及答辩材料申领汇总表》（纸质版，附件3）。领取答辩材料前，请确认以下事项：\n1.成绩合格，达到培养方案各项要求（留学生成绩单请联系国际学院）。\n2.至少已有1篇满足科研要求的成果见刊，且在研究生综合管理信息平台“学生电子档案”处已通过学院审核。\n3.导师签字的《博士学位论文答辩导师意见书》已交学院审核、留存。\n4.答辩公告已发布。\n（四）申请人若在此期间有了新的科研成果，应在研究生综合管理信息平台“学生电子档案”处更新填报，并关注学院对科研成果审核的相关通知，按时将发表论文原件及复印件提交所在学院。学院审查原件，留存复印件。科研发表真实性审核由学院负责，若存在作假行为，学院及学生承担相应责任。\n三、同等学力硕士双盲评审结果\n根据《对外经济贸易大学硕士学位论文双盲评审办法》，同等学力硕士双盲评审中，每篇学位论文由2位同行专家通讯评议，专家给出评议意见的同时，做出相应评阅结论。\n（一）2位专家中，没有专家的评阅结论为C，则认定为该学位论文双盲评审通过，应参考专家评议意见，在导师指导下对论文作进一步修改。\n（二）2位专家中，有1位专家的评阅结论为C，双盲评审原则上不通过，不能参加本次答辩。\n同等学力人员异议复审申请确系客观论据充分、获导师及其他专家组认可，经学院学位评定分委员会同意复审后，可由学院于评审结果公布之日起7日内统一向学位办提出复审申请，同时提交申诉纸质材料，包括（1）申诉书、（2）导师对申诉的意见、（3）学院学位评定分委员会意见、（4）校内三位同行专家的意见（点击下载）。若申诉成立，学位办将组织进行异议论文复审，再送1位专家。初复审3位专家中，有2位以上（含2位）专家的评阅结论为C，双盲评审不通过，不能参加本次答辩。申请人须对论文进行较大程度的修改，待再次申请学位时重新提交论文双盲评审。\n（三）2位专家中，有2位专家的评阅结论为C，双盲评审不通过，不能参加本次答辩。由导师、学院作出选题评估，确有必要应重新开题写作，答辩期后延半年至一年。\n四、其他说明\n（一）双盲通过的申请人应根据专家评阅和导师意见，认真修改、完善学位论文，经导师同意并签署《博士/硕士学位论文答辩导师意见书》（附件4）后，方能参加答辩。\n（二）答辩大致安排在10月中下旬至11月中下旬，具体日期由学院根据双盲结果返回情况组织安排，请关注学院通知。学院至少提前三天在研究生综合管理信息系统中发布答辩公告，不得答辩后补报，不得随意更改答辩日期。\n（三）答辩材料统一使用学位办制作的纸质材料。硕士（含同等学力）材料由学院统一领取、组织发放。\n \n附件（点击下载）：\n1.双盲预警告知书线上签收操作说明\n2.博士学位论文双盲评审结果预警及责任告知书（兼职博导、留学生及其导师）\n3.博士答辩资格审核确认及答辩材料申领汇总表\n4.博士/硕士学位论文答辩导师意见书\n \n \n \n研究生院学位办公室\n2026年10月15日"}, "05f47cdec6c831543f98d8bf97858a78": {"notice_id": "05f47cdec6c831543f98d8bf97858a78", "title": "对外经济贸易大学2027年硕士研究生剩余统考招生计划", "source": "研究生院-通知公告", "category": "教务通知", "publish_time": "2026-10-15", "url": "http://yjsy.uibe.edu.cn/cms/infoSingleArticle.do?articleId=7933&columnId=2395", "deadline": "", "event_time": "", "summary": "公布2027年硕士统考剩余招生计划，供考生参考", "content": "各位硕士考生：\n根据我校2027年硕士研究生招生专业目录公示的拟招生人数（不含“少数民族高层次骨干人才计划”、“退役大学生士兵”等专项硕士研究生招生计划），结合我校2027年招收推免生人数，现将剩余统考招生计划公布如下：\n学院代码及名称专业代码及名称学习形式统考剩余计划(001)国际经济贸易学院(020106)人口、资源与环境经济学全日制3(020203)财政学全日制1(020204)金融学全日制12(020205)产业经济学全日制6(020206)国际贸易学全日制22(0202Z2)运输经济与物流全日制5(0202Z4)能源与低碳经济学全日制2(025100)金融全日制143(025300)税务全日制28(025400)国际商务全日制157(120100)管理科学与工程全日制8(025800)数字经济非全日制30(002)中国金融学院(020204)金融学全日制10(0202Z5)金融工程全日制9(025100)金融全日制188(025800)数字经济非全日制20(003)国际商学院(120202)企业管理全日制12(120204)技术经济及管理全日制4(125300)会计全日制70(125100)工商管理非全日制180(125700)审计非全日制42(004)人工智能与数据科学学院(120100)管理科学与工程全日制14(140500)智能科学与技术全日制19(005)法学院(030101)法学理论全日制2(030103)宪法学与行政法学全日制3(030104)刑法学全日制3(030105)民商法学全日制14(030106)诉讼法学全日制2(030107)经济法学全日制9(030109)国际法学全日制23(035101)法律（非法学）全日制49(035102)法律（法学）全日制40(006)英语学院(050201)英语语言文学全日制2(050211)外国语言学及应用语言学全日制12(055101)英语笔译全日制29(055102)英语口译全日制80(007)外语学院(050202)俄语语言文学全日制5(050203)法语语言文学全日制5(050204)德语语言文学全日制4(050205)日语语言文学全日制3(050207)西班牙语语言文学全日制3(050208)阿拉伯语语言文学全日制3(050209)欧洲语言文学全日制3(050210)亚非语言文学01不区分研究方向（朝鲜语）全日制2(050210)亚非语言文学02不区分研究方向（越南语）全日制2(055104)俄语口译全日制6(055106)日语口译全日制32(055112)朝鲜语口译全日制28(008)政府管理学院(120401)行政管理全日制11(120404)社会保障全日制3(1204Z1)公共经济管理全日制3(1204Z2)海关管理全日制6(1204Z3)文化产业管理全日制3(125200)公共管理全日制5(125200)公共管理非全日制122(009)保险学院(020204)金融学全日制6(020207)劳动经济学全日制5(0202Z3)精算学全日制11(025500)保险01精算与风险管理（贸大-天普大学中外合作办学）全日制18(025500)保险02其他方向全日制83(010)中国世界贸易组织研究院(020105)世界经济全日制8(020201)国民经济学全日制11(012)国际关系学院(030201)政治学理论全日制5(030207)国际关系全日制4(0302Z1)全球治理全日制4(035500)国际事务全日制18(140200)国家安全学全日制7(014)统计学院(025200)应用统计全日制52(070104)应用数学全日制5(070105)运筹学与控制论全日制4(015)文学与国际传播学院(045300)国际中文教育全日制32(050102)语言学及应用语言学全日制2(050105)中国古代文学全日制2(050106)中国现当代文学全日制2(017)全球价值链研究院(0202J2)全球价值链全日制16(018)马克思主义学院(030501)马克思主义基本原理全日制4(030503)马克思主义中国化研究全日制5(030505)思想政治教育全日制6(030506)中国近现代史基本问题研究全日制6(020)国际发展合作学院(020105)世界经济全日制5(0302Z2)国际发展全日制9(021)经济学院(020101)政治经济学全日制4(020104)西方经济学全日制4(020105)世界经济全日制26(020205)产业经济学全日制4(020209)数量经济学全日制4(025800)数字经济非全日制20\n特别说明：各专业最终录取人数将视上级计划部门正式下达的招生计划、社会需求、生源情况和学校学科发展需要进行适当调整。"}, "212131789a07ca0aca66a982db96a308": {"notice_id": "212131789a07ca0aca66a982db96a308", "title": "启航！外语学院举行2026级新生开学典礼", "source": "外语学院-学院动态", "category": "其他", "publish_time": "2026-10-14", "url": "https://sfs.uibe.edu.cn/ttxw/290a139c838046679f9197bb7283f87a.htm", "deadline": "", "event_time": "2026-09-10", "summary": "外语学院举行2026级新生开学典礼，9月10日举办", "content": "启航！外语学院举行2026级新生开学典礼\n发表时间：2026-10-14\n金秋九月，宁远楼三层会议厅内气氛热烈。9月10日下午，对外经济贸易大学外语学院2026级新生开学典礼隆重举行。学院1989届阿拉伯语专业校友、中国驻约旦大使馆经济商务参赞程永如先生，学院院长李运博、党委书记田文泉、副院长黄慧、副院长胡明、党委副书记童德毅等学院领导，以及教授代表、各学系主任、辅导员老师，与全体2026级本、硕、博新生齐聚一堂，共同见证新一届外语人扬帆起航的重要时刻。党委副书记童德毅主持典礼。\n多语种歌曲《TryEverything》的旋律率先响起，外院学子用多种语言唱出青春的朝气与无畏，瞬间拉近了新生与学院的距离，也为整场典礼定下了开放、多元、热烈的基调。在全场师生庄严的国歌声中，典礼正式拉开序幕。\n本科新生代表、2026级葡萄牙语专业本科生黄纯煜首先发言，他从自己对语言的认知出发，将语言比作感知多元文明、开展跨文化交流的钥匙。他认为，不必急于求成，脚踏实地地过好每一天，在日复一日的学习中沉淀，才是通往广阔世界的必经之路。他表示，将专注自身成长，上好每一堂课，做好每一次练习，不断积蓄力量，书写崭新的大学生活。\n研究生新生代表、2026级日语口译专业硕士研究生郭依诺结合自己辅修国际经济与贸易的经历，抛出了研究生阶段“该如何度过”的思考。面对AI高速发展的现实，她认为外语人真正的底气，在于复杂情境中的判断力以及对语言细微差异的敏感度。她鼓励大家既要清楚“为何出发、走向哪里”，又要向专业深处扎根，同时将视野放向更广阔的天地，把专业所学与时代需求、国家方向真正结合起来。\n在校本科生代表、2024级西班牙语专业本科生贺虹瑜用真诚的自我剖析打动了在场听众。她提起初学外语时“十道题错七道”的窘迫，感慨正是老师的耐心和陪伴，让她明白语言学习没有捷径，每一份微小的努力都在积累未来的可能。从多语言服务中心到暑假海外交换，她在一次次真实的跨文化互动中，感受到语言连接世界的分量；在学生工作中，她学会了在细微的责任里找到自己的步调。\n在校研究生代表、2025级朝鲜语口译专业硕士研究生潘钰虹以“知之不若行之”为核心，分享了她在高端国际交流活动、党建宣讲和校外服务中的真切感悟。她认为，真正的成长来自一次次临场实践，理论学习只有转化为实际行动，才能真正做到博观约取、厚积薄发。\n学院1989届阿拉伯语专业毕业生、中国驻约旦大使馆经济商务参赞程永如先生作为校友代表发言。他结合自己多年来一线亲身经历娓娓道来，用鲜活生动的商务故事，向在场师生讲述外语人如何凭借扎实的语言功底与外交素养，在国际舞台维护国家与人民的切身利益。他勉励在场新生牢记“心系祖国、放眼世界、服务为本、终身学习”。面对人工智能浪潮快速发展的时代背景，他希望同学们坚定信心，努力夯实语言基本功，传承外语人的使命与担当，为国家对外开放事业作出自己的贡献。\n典礼当天，恰逢我国第42个教师节，来自学院12个专业的同学们，代表全院1236名学生，用13种语言，为亲爱的外院老师们献上多语种朗诵《我的老师》，向老师们献上真挚的敬意，现场充满感动与暖意。\n教授代表、俄语系李锡奎教授在发言中给新生带来了实用的建议。他提醒同学们合理规划选课，并做好自我规划、自我管理与自我督促。在他看来，外语学习不仅是掌握一种工具，更是理解世界、社会与人的过程，他鼓励大家主动打破学科壁垒，将语言与文化、文学、国际关系、国际贸易和区域国别等领域交叉融合。\n院长李运博教授作总结讲话，他带同学们回顾了贸大的历史与外语学院的发展脉络。他指出，在国家高水平对外开放、“一带一路”倡议、区域国别研究以及国际传播等新使命面前，外语人肩负着认识不同文明、沟通世界的重任。他勉励同学们把“知行合一”融入日常，将个人所学融入国家发展和对外交往的大局，努力成为中华文化的传播者、文明互鉴的推动者和国际交流的践行者。在服务国家、服务社会、服务他人的过程中书写自己的青春价值，共同创造一个属于2026级全体同学的光荣历史！\n典礼最后，党委书记田文泉领读《2026级外语人宣言》。全体新生肃立，齐声宣读，用掷地有声的誓言许下属于新一代外语人的承诺。\n从这一刻起，2026级新同学从贸大外院正式启航。站在新的起点，愿大家怀揣热忱与理想，深耕语言沃土，品读多元文化，以语言为舟，以实践为桨。在课堂上积淀学识，在交流中拓宽视野，勇敢跨越语言的边界。前路漫漫亦灿灿，期待你们保持好奇、脚踏实地，在世界的舞台上舒展锋芒，书写属于自己的精彩篇章。"}, "f8c05cf67fdcd29ef204abbb06457942": {"notice_id": "f8c05cf67fdcd29ef204abbb06457942", "title": "图书馆一小时数据库培训：《外文学术资源整合服务系统》使用技巧", "source": "图书馆-培训讲座", "category": "学术活动", "publish_time": "2026-10-13", "url": "https://lib.uibe.edu.cn/pxjz/630df77f1d084ebfba8fa2f6898064c3.htm", "deadline": "", "event_time": "2026-10-15", "summary": "图书馆举办外文数据库使用培训讲座，10月15日线上举行", "content": "为便于广大师生更好地利用各类电子资源，图书馆推出一小时数据库培训系列活动。本学期数据库培训将继续采用线上线下相结合的形式，帮助师生梳理学术资源、提升实证研究技巧。\n时间：2026年10月15日（星期四）14:00–15:00\n主讲人：古扬学术周贤林\n讲座方式：线上\n直播方式：腾讯会议号606647568\n讲座主题：\n如何快速查找高价值外文文献\n讲座内容大纲：\n1.如何快速查找、获取高价值文献；\n2.如何查找学科高影响力期刊，快速获取期刊影响因子、H指数、JCR分区、中科院分区、新锐分区等评价信息；\n3.如何查询行业大牛研究成果；\n4.论文稿件如何精准匹配投稿期刊，助力科研发表；\n5.如何识别预警期刊和风险论文，规避科研风险。\n数据库介绍：\n古扬《外文学术资源整合服务系统》是专业化的外文学术资源发现平台，全面整合全球优质外文资源，涵盖SCI、EI等核心收录，集一站式检索、高价值文献发现、期刊分析、投稿推荐、学者追踪、撤稿发现、风险论文揭示等多功能一体，方便查全、查准、查好外文资源，是广大师生快速了解国际学术前沿，提高研究水平、写作创作等非常需要的外文知识库。\n产品访问地址：https://fars.gytec.net\n也可直接登录学校图书馆网站-数据库导航-外文学术资源整合服务系统\n1、校内使用：学校IP范围内免登录，可直接使用；\n2、校外使用：须首先在学校IP范围内注册一次方可校外使用。或通过CARSI平台访问使用。\n联系信息：\n关于图书馆资源利用问题的咨询与培训，欢迎联系我们：\n联系电话：010-64496105/5195\n邮箱：uibetsg@163.com\n图书馆\n2026年10月13日"}, "5fffedbb30bff30cecc1bfdde6028d19": {"notice_id": "5fffedbb30bff30cecc1bfdde6028d19", "title": "关于2027届研究生毕业电子图像采集工作的通知", "source": "研究生院-培养信息", "category": "教务通知", "publish_time": "2026-10-13", "url": "http://yjsy.uibe.edu.cn/cms/infoSingleArticle.do?articleId=7930&columnId=2154", "deadline": "2026-11-15", "event_time": "2026-10-22", "summary": "2027届预毕业研究生须于10月22日参加图像采集，答辩者11月15日前完成", "content": "各2027届预毕业研究生：\n按照国家教育部和北京市教委关于毕业生电子注册的有关文件要求，现将我校研究生毕业电子图像采集工作安排及相关注意事项通知如下：\n一、采集对象\n全体2027年预毕业硕、博士研究生须参加图像采集，有下列情况可免采集：\n1.已通过本年度硕博连读选拔的研究生，不颁发硕士毕业证书、学位证书，无需参加硕士阶段采集。\n2.往年已完成毕业电子图像采集的延期研究生，无需重复采集。核验路径：研究生综合管理信息系统→毕业信息→核对毕业信息，查看页面右侧是否已有毕业照片。\n3.因休学等延期至2028年及以后毕业的研究生，可在预毕业当年参加采集。\n二、校内采集安排\n1.采集时间：10月22日（星期四）8：30-16：30（中午12:30-13:30休息）\n时间\n学院\n8：30—9：30\n英语学院、政府管理学院、统计学院\n9：30—10：30\n国际经济贸易学院专硕\n10：30—11：30\n国际经济贸易学院学硕博、外语学院、文学与国际传播学院、国际发展合作学院\n11：30—12：30\n国际商学院\n13：30—14：30\n中国金融学院\n14：30—15：30\n法学院、中国世界贸易组织研究院、国际关系学院、马克思主义学院\n15：30—16：30\n人工智能与数据科学学院、保险学院、教育与开放经济研究中心、全球价值链研究院、经济学院\n各学院原则上按上表时间参加校内集中采集，如有其他安排冲突，可在不影响现场秩序的前提下自行调节拍照时间。\n2.采集地点：诚信102、202教室\n两个教室分别位于诚信楼一层、二层西侧，同学们可视现场情况自行选择教室排队采集。\n三、采集要求\n1.本次采集照片将用于毕业证书、学位证书制作，由高校数码证照采集点（易拍数码影像中心）负责拍摄并录入教育部学信网，不支持通过其他渠道自行上传学历照片。\n2.提前获取并保存学信网“图像采集码”，现场出示给摄影师。拟申请提前毕业的同学，须先联系学院教务员、统一报研究生院，待反馈更新学信网数据后、再查看采集码。\n采集码获取步骤：微信搜索“学信网”服务号→常用服务→学信档案→“登录”或“进入”账号→学籍学历学位→学籍信息→选择“对外经济贸易大学”→查看图像采集码。无法登录学信网账号的学生请先注册。\n3.拍摄要求：（1）头发不得遮挡眉毛、眼睛、耳朵；（2）不得戴有色（含隐形美瞳）眼镜；（3）不宜化妆；（4）不得佩戴耳环、项链、头饰等饰品；（5）拍摄背景为蓝色，着装请与背景色明显区分。\n4.拍摄费用：20元/人，现场交付摄影师，请自备零钱或支付宝支付，不支持微信支付。\n5.参加拍照学生较多，时间紧张，请同学们积极配合拍照工作，做好各项准备，以免影响拍摄进度。\n四、校外补拍安排\n1.校内集中采集仅1天，如确有特殊原因不能按时拍摄的，请于10月23日-12月31日间自行前往易拍公司进行补拍。\n补拍地址：北京市朝阳区国贸建外SOHO东区A座2501A室。\n工作时间：周二至周日9：00-17：00（中午12:00-13:00休息）。\n补拍费用：30元/人。\n2.已申请参加2026年秋季学期参加论文答辩的预毕业生，请务必在11月15日前完成采集，以免影响后续证书制作。\n3.因短期出国、休学等情况不能在本学期内完成采集的同学，请关注下学期开学初的通知，按要求时间前往校外补拍。\n4.拍摄公司联系电话：010-58691620；研究生院培养办联系电话：010-64496804。\n \n研究生院培养办公室\n2026年10月13日"}, "3fea89f2f672ad6bb471a2d39aa50a0c": {"notice_id": "3fea89f2f672ad6bb471a2d39aa50a0c", "title": "“贸大法学院学生法律沙龙”第52期征文获奖名单 - 对外经济贸易大学法学院", "source": "法学院-通知公告", "category": "学术活动", "publish_time": "2026-10-12", "url": "http://law.uibe.edu.cn/xwzx/tzgg/f9854b68acb84c8b9162d8f335391351.htm", "deadline": "", "event_time": "", "summary": "第52期法律沙龙征文获奖名单公示，公示期10月13日至19日", "content": "学院概况\n院长寄语\n学院简介\n学系介绍\n学科建设\n组织机构\n历任院长\n院徽院训\n联系我们\n新闻快讯\n学院新闻\n媒体贸法\n学术活动\n视频中心\n师资队伍\n专任教师\n涉外院研究员\n外籍专家\n退休教师\n学者风采\n党建工作\n组织机构\n理论学习\n党建动态\n支部建设\n党务公开\n学术科研\n学术成果\n研究中心\n科研立项\n教务教学\n师德师风\n教务公告\n培养方案\n精品课程\n课程思政\n教学立项\n招生就业\n招生\n就业\n在职研修班\n国际交流\n交流动态\n合作院校\n合作项目\n校友工作\n校友风采\n校友活动\n校友名录\n沈冯基金\n涉外法治研究院\n经贸法律评论\nEnglish学校主页\nEnglish\n学校主页\n学院概况\n院长寄语\n学院简介\n学系介绍\n学科建设\n组织机构\n历任院长\n院徽院训\n联系我们\n新闻快讯\n学院新闻\n媒体贸法\n学术活动\n视频中心\n师资队伍\n专任教师\n涉外院研究员\n外籍专家\n退休教师\n学者风采\n党建工作\n组织机构\n理论学习\n党建动态\n支部建设\n党务公开\n学术科研\n学术成果\n研究中心\n科研立项\n教务教学\n师德师风\n教务公告\n培养方案\n精品课程\n课程思政\n教学立项\n招生就业\n招生\n就业\n在职研修班\n国际交流\n交流动态\n合作院校\n合作项目\n校友工作\n校友风采\n校友活动\n校友名录\n沈冯基金\n涉外法治研究院\n经贸法律评论\n新闻快讯\n学院新闻\n媒体贸法\n学术活动\n视频中心\n您所在的位置：首页-新闻快讯-通知公告\n“贸大法学院学生法律沙龙”第52期征文获奖名单\n日期:2026-10-12|点击量:\n经过《贸大法学》编辑部组织，由8名评委组成评审小组，严格按照学术创新和学术规范的评审标准，采取双向匿名、本研分开评审、每位评委独立打分、根据得分统计排名、初评加复评等评审方式，从29篇参评论文中评选出以下论文为第52期法律沙龙获奖论文，特此公示。公示期为10月13日-10月19日。\n研究生组：\n一等奖：【陈文茜、褚吉顺、范瑞乔】\n二等奖：【高丹阳、郭雨萱、李星月、彭萱】\n三等奖：【齐若彤、邢思彤、肖家琪、赵婕妤】\n本科生组：\n一等奖：【段京宏、丁琪涵、黄浩冉、蒋婷】\n二等奖：【李瑷桐、李苗彤、李熙萍、张一帆、李昀阳、潘禹含、石怡晨】\n三等奖：【唐佩敏、王思逸、吴青宇、杨紫仪、张萌珊、张斯雅、李香凝、李瑀涵、叶霁菲】\n获奖证书将于近日颁布，并作为综合测评中科研表现的凭证。\n对外经济贸易大学法学院\n《贸大法学》编辑部\n2026年10月13日\n版权所有：对外经济贸易大学法学院地址：北京市朝阳区惠新东街10号宁远楼7层邮编：100029邮箱：uibelaw@uibe.edu.cn；uibelaws@126.com"}, "7ec24f416fabdde0e43c28a9e507b008": {"notice_id": "7ec24f416fabdde0e43c28a9e507b008", "title": "教务处召开新一代综合教务系统建设工作例会-部门动态-对外经济贸易大学教务处", "source": "教务处-部门动态", "category": "行政党务", "publish_time": "2026-10-12", "url": "http://jwc.uibe.edu.cn/bmdt/c9c3c8dac51b466baf5d9bc935fb5c52.htm", "deadline": "", "event_time": "2026-10-09", "summary": "教务处召开教务系统建设例会，讨论培养方案等工作", "content": "教务处|摄影：教务处|日期：2026-10-12|访问量：\n2026年10月9日下午14点，教务处处领导、相关业务科室负责人及开发公司项目组在诚信618会议室召开新一代综合教务系统建设例会。\n会上，开发公司项目组汇报了本周工作进展与下周计划，会议重点讨论了培养方案、空闲教室查询链接相关工作。会议明确了解决上述问题的下一步工作方案，并落实了各项任务的牵头负责人。\n最后，处领导总结发言，强调本学期系统建设工作需持续有序、平稳推进，推动各功能模块进一步优化完善。\nCopyRight©版权所有：对外经济贸易大学教务处，ALLRightsReserved\n北京市朝阳区惠新东街10号邮编：100029"}, "portal_8490918697406464": {"notice_id": "portal_8490918697406464", "title": "一周校园就业招聘和指导安排（2026.10.12-10.16）", "source": "招生就业处", "category": "就业实习", "publish_time": "2026-10-12", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=8490918697406464", "deadline": "", "event_time": "", "summary": "招生就业处发布一周校园招聘和指导活动安排，学生可参加", "content": "招生就业处一周校园就业招聘和指导安排（2026.10.12-10.16）序号活动日期活动时间活动名称活动类型活动地点110月12日周一上午09:30-11:30山东省选调生招录政策宣讲宣讲会求真楼3192下午14:30-16:30“惠”就业课堂（第44期）——北京事业单位考试考情分析及备考指导就业指导活动求真楼一层招聘大厅3下午14:30-16:30中兴通讯2027届校园招聘宣讲会求真楼3194晚上18:30-20:30建发股份2027届秋招校园宣讲会宣讲会求真楼319510月13日周二上午09:30-10:30山东高速集团有限公司校园招聘对外经济贸易大学专场宣讲宣讲会求真楼一层招聘大厅6上午10:30-11:30山东高速集团有限公司校园招聘对外经济贸易大学专场双选会（总第十一场）双选会求真楼一层招聘大厅7上午09:30-10:30CVTE视源股份2027届商务职能类招聘宣讲会宣讲会求真楼401A8下午14:00-15:00中国平安2027全球校园招聘宣讲会宣讲会求真楼3199下午15:00-16:00中国平安2027全球校园招聘双选会（总第十二场）双选会求真楼一层招聘大厅10晚上18:30-20:30顾家家居股份有限公司2027届校园招聘宣讲会宣讲会求真楼31911晚上18:30-20:30吉林银行2027届秋季校园招聘宣讲会求真楼401A12晚上18:30-20:30大众汽车金融服务（中国）2027届校园招聘宣讲会求真楼一层招聘大厅1310月14日周三上午09:30-11:30广州银行股份有限公司2027年校园宣讲会宣讲会求真楼31914上午09:30-11:30中国联通天津市分公司2027对外经贸大学校园招聘宣讲会宣讲会求真楼一层招聘大厅15下午14:30-16:30兖矿能源集团股份有限公司2027届校园招聘宣讲会宣讲会求真楼一层招聘大厅16下午14:30-16:30北汽集团2027届全球校园招聘宣讲会求真楼31917下午14:00-16:30北京就业指导名师工作室就业指导活动求真楼31218晚上18:30-20:30广东华兴银行2027校园招聘宣讲会宣讲会求真楼31919晚上18:30-20:30浙江省交通投资集团有限公司2027届校园招聘宣讲会求真楼一层招聘大厅2010月15日周四上午09:30-11:30深圳能源2027届秋季校园招聘宣讲会宣讲会求真楼4"}, "portal_7522493548367872": {"notice_id": "portal_7522493548367872", "title": "关于举办2026年内地(大陆)高校港澳台学生中华文化知识大赛的通知", "source": "学工部", "category": "比赛竞赛", "publish_time": "2026-10-09", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=7522493548367872", "deadline": "2026-10-15", "event_time": "", "summary": "港澳台及部分内地学生可报名中华文化知识大赛，10月15日截止", "content": "各学院、全体学生：为深入贯彻落实党的二十大和二十届历次全会精神，进一步弘扬中华传统文化，不断增强港澳台学生的国家认同感、历史责任感和文化归属感，教育部港澳台办公室拟举办2026年内地(大陆)高校港澳台学生中华文化知识大赛，并委托复旦大学承办。现就参赛事宜通知如下：一、参赛对象在内地(大陆)高校学习的港澳台大学生和部分内地(大陆)大学生。二、比赛形式比赛分三个阶段：校内预赛、全国复赛和总决赛。(一)校内预赛：即日起至2026年10月15日为校内预赛报名阶段，校内预赛时间为2026年10月22日至2026年11月13日，以线上方式自主进行选拔，组委会根据报名情况向参赛学校发送题库、答题系统及使用手册等。根据校内预赛结果，最终推荐1支队伍参加全国复赛(人数为3人，至少包含两名港澳台学生，以所持证件为准)。(二)全国复赛：拟于2026年11月23日至27日在线上举行，均为必答题。复赛题库将有10%的新题目替换旧题目。各参赛队3名队员须在同一场地独立完成答题，以3名队员的个人得分相加作为该队伍的总分。全国复赛按照所有参赛队分数由高至低排序，选取总分排名前20的队伍进入总决赛。(三)总决赛：拟于2026年12月在复旦大学举行，包括必答题和抢答题。总决赛题库将有20%的新题目替换旧题目。三、奖项设置总决赛设一等奖1名、二等奖2名、三等奖3名。四、报名及参赛流程校内预选赛将以线上个人作答的形式开展，请符合条件有意向参赛的同学于2026年10月15日17:00点前将报名表（附件）发送至xgb@uibe.edu.cn，邮件主题为“中华文化知识大赛报名”，并扫码进入预赛群。五、联系方式学工部学生事务管理科娜老师，电话：64493295研工部综合事务科罗老师，电话：64492544港澳台事务办公室武老师，电话：64493219附件：2026年内地（大陆）高校港澳台学生中华文化知识大赛报名表.docx学工部/学生处/武装部党委研究生工作部港澳台事务办公室2026年10月9日"}, "portal_7156727772078080": {"notice_id": "portal_7156727772078080", "title": "关于举办首届智能应用创新大赛第二场专题培训的通知", "source": "网络安全和信息化处", "category": "比赛竞赛", "publish_time": "2026-10-08", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=7156727772078080", "deadline": "2026-10-30", "event_time": "2026-10-11", "summary": "全校师生参加智能应用创新大赛培训，报名10月30日截止", "content": "全体师生：我校首届智能应用创新大赛已于9月17日启动报名。为帮助师生熟悉赛事要求、掌握校级智能体开发平台操作，更好地备赛参赛，网络安全和信息化处特组织系列专题培训。现将第二场培训安排通知如下：一、培训时间2026年10月11日（周日）9:30—11:30二、培训形式本次培训采用#腾讯会议#形式线上举办，会议号：171-688-917。三、培训内容“工作流核心节点讲解+MCP插件介绍+进阶智能体搭建”——掌握进阶能力，搭建“能做事”的智能体四、重要提示1.大赛报名截止时间为2026年10月30日，尚未报名的团队请及时登录【大赛官网】（https://aihome.uibe.edu.cn/competitionIndex）完成线上报名。2.已报名的师生可微信扫描下方二维码，激活智能体开发平台的开发者权限（已激活师生无需重复操作），提交信息后待审核开通。3.本次大赛配套上线“智能应用大赛服务助手”，可解答大赛报名、培训、智能体搭建等相关问题，请点击链接或扫码访问：https://aihome.uibe.edu.cn/shareBotChat/dalkoq4a6jhs72plmrdg4.赛事相关信息将在赛事官方QQ群内发布，请尚未加入赛事群的师生尽快入群。赛事官方QQ群：1121090025（入群备注学号/教工号+姓名）网络安全和信息化处2026年10月8日"}, "portal_7150401922785280": {"notice_id": "portal_7150401922785280", "title": "关于办理2026-2027学年校园地国家助学贷款的通知", "source": "学工部", "category": "奖助学金", "publish_time": "2026-10-08", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=7150401922785280", "deadline": "2026-10-12", "event_time": "", "summary": "家庭经济困难学生需10月12日前提交汇总表并10月14-15日现场办理助学贷款", "content": "各培养单位、相关学生：根据《教育部等四部门关于调整完善助学贷款有关政策的通知》（财教〔2023〕4号）要求，结合我校实际，现组织开展2026-2027学年校园地国家助学贷款办理工作。相关事项通知如下：一、办理对象申请校园地国家助学贷款的学生须为经过本学年家庭经济困难认定的本科生、研究生、预科生。二、办理安排1. 前序工作：为保证本学年申请新办校园地国家助学贷款学生顺利完成贷款签约，需先开展银行卡开卡工作，由经办行中国银行工作人员前来学校，现场办理开卡及申请校园地国家助学贷款。根据经办行要求，开卡前需在银行系统核验开卡资格。请所有申请办理校园地国家助学贷款的学生（含新办和续贷）填写汇总表（附件1），并扫码加入“2026年校园地国家助学贷款办理群”（附件2）。2.资格核验：由银行核验学生开卡资格，如有问题会直接跟学生取得联系，为学生线下开卡做好准备，确保办理当天的助学贷款申请材料填写及签约事宜顺利进行。3.现场办理：请全体办理校园地国家助学贷款的学生（含首贷和续贷）于10月14日（周三）、15日（周四）9:00-12:00、13:00-16:30前往求真楼202A现场办理。4.到场需携带：①本人最新身份证；②学生证或录取通知书（显示学制）；③手机（确保手机号为本人实名制手机号，并提前下载“中国银行”手机APP）。三、办理流程 四、工作要求1.根据最新政策文件精神，学生申请的国家助学贷款应优先用于支付在校期间学费和住宿费，超出部分可用于弥补日常生活费用。请各学院通知相关学生提前了解政策。往年线下办理过校园地国家助学贷款的学生如有提额需要，需线上申请，具体流程咨询经办银行即可。2.已申请生源地助学贷款的学生不得同时再申请校园地国家助学贷款。3.请各培养单位于10月12日（周一）上午10点前，本研分别以学院/研究院为单位汇总提交附件1的汇总表电子版，本科生汇总表发送至uibexszz@uibe.edu.cn；研究生汇总表发送至uibeygbjz@uibe.edu.cn。4.请相关学生提前安排好时间，及时办理并关注群内通知，未入群的同学请通过学院联系资助中心及时进群。 咨询电话：010-64688699，010-64689535（中国银行）010-64494008（本科生、预科生），010-64496803（研究生） 附件1：2026年校园地助学贷款申请信息汇总表.xlsx"}, "portal_7145822500589568": {"notice_id": "portal_7145822500589568", "title": "关于启动2027年大学生创新训练计划申报工作的通知", "source": "创新创业中心", "category": "科研项目", "publish_time": "2026-10-09", "url": "https://i.uibe.edu.cn/tp_up/view?m=up#act=up/pim/showpim&id=7145822500589568", "deadline": "2026-10-30", "event_time": "", "summary": "全日制在读本科生申报2027年大学生创新训练计划，10月30日17:00截止", "content": "各学院、各位同学：为深入贯彻落实《国务院办公厅关于进一步支持大学生创新创业的指导意见》《国务院办公厅关于深化高等学校创新创业教育改革的实施意见》等文件要求，进一步深化新发展阶段高校创新创业教育改革，根据教育部、北京市相关工作要求，现启动我校2027年大学生创新训练计划申报立项工作，有关事项通知如下：一、申报项目类型1.创新训练项目：本科生个人或团队在导师指导下，自主完成创新性研究项目设计、研究条件准备和项目实施、研究报告撰写、成果(学术)交流等工作。创新训练项目可以是具有较强创新特色的概念、产品或服务设计（如：金融产品、文化产品、学习方法等）、学术理论构建、管理制度设计、校园文化活动策划等。2.创业训练项目：本科生团队在导师指导下，团队中每个学生在项目实施过程中扮演一个或多个具体角色，完成商业计划书编制、可行性研究、企业模拟运行、撰写创业报告等工作。与创新训练项目相比，创业训练项目更侧重商业运作过程。3.创业实践项目：学生团队在学校导师和企业导师共同指导下，采用创新训练项目或创新性实验等成果，提出具有市场前景的创新性产品或服务，以此为基础开展创业实践活动。与创业训练相比，创业实践项目更侧重真实落地、注册成立公司情况以及实效。二、申报原则及要求1.申报人员须为我校全日制在读本科生。每名学生每年度最多申报1个项目，每个项目限1名负责人，项目团队人数不少于3人，不超过10人（含负责人）；2.申报项目须积极报名参加学校组织的各类创新创业大赛，提升项目质量；3.立项后原则上不得终止，如果项目在非客观原因情况下终止，将取消负责人未来申报资格，并视情况对团队成员未来申报资格进行严格考察，没有终止记录及确因客观原因终止的项目，负责人及成员可正常申报后续年度的项目；4.项目立项后，创新创业中心将定期组织项目进度检查，负责人须按要求填报相关检查材料，不按要求参加检查的项目，创新创业中心有权对项目进行中止；5.已申报过的往届项目不得重复申报。三、申报及评审程序1.申报时间：即日起至10月30日下午17：00。2.申报方式：项目负责人登录贸创云平台http://202.204.175.120/（推荐使用360浏览器）填报项目及成员信息（密码：Uibe@身份证后八位，或身份证后八位，再或Uibe@123456）。根据项目属性选择“创新训练项目”-选A/“创业训练项目”-选B/“创业实践项目”"}}};</script>
+<script>
+/* ================== 工具 ================== */
+const $ = (s)=>document.querySelector(s);
+const esc = (s)=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const TODAY = DATA.today;
+const LS = "uibe.static.v1.";
+
+function dayDiff(d){                       // 距离今天还有几天
+  if(!d) return null;
+  const a = new Date(d+"T00:00:00"), b = new Date(TODAY+"T00:00:00");
+  return Math.round((a-b)/86400000);
+}
+function dlTag(d){
+  const n = dayDiff(d);
+  if(n===null) return "";
+  if(n<0) return "已过期";
+  if(n===0) return "🔴 今天截止";
+  if(n<=3) return `🔴 还有 ${n} 天`;
+  if(n<=7) return `🟠 还有 ${n} 天`;
+  return `还有 ${n} 天`;
+}
+/* 活动时间已过 → 明确写"已结束"，别让人以为还能参加 */
+function eventLabel(ev){
+  if(!ev) return "";
+  const m = String(ev).match(/\d{4}-\d{2}-\d{2}/);
+  if(m){
+    const n = dayDiff(m[0]);
+    if(n!==null && n<0) return `⏰ 活动已于 ${m[0]} 结束`;
+  }
+  return `⏰ ${ev}`;
+}
+function isVideoOrNews(){ return false; }
+
+/* ================== 状态 ================== */
+const S = {
+  no:null, page:"dashboard", section:null,
+  calY:Number(TODAY.slice(0,4)), calM:Number(TODAY.slice(5,7)),
+  open:{}, msg:""
+};
+let U = null;      // 当前用户快照
+let ST = null;     // 本地状态
+
+/* 存储降级：某些环境（Safari 打开本地文件、微信内置浏览器、无痕模式）
+   访问 localStorage 会直接抛异常，若不兜底会导致整页白屏 */
+const __MEM = {};
+const LSOK = (function(){
+  try { localStorage.setItem("__probe__","1"); localStorage.removeItem("__probe__"); return true; }
+  catch(e){ return false; }
+})();
+function lsGet(k){ try { return LSOK ? localStorage.getItem(k) : (__MEM[k]||null); } catch(e){ return __MEM[k]||null; } }
+function lsSet(k,v){ try { if(LSOK) localStorage.setItem(k,v); else __MEM[k]=v; } catch(e){ __MEM[k]=v; } }
+function lsDel(k){ try { if(LSOK) localStorage.removeItem(k); else delete __MEM[k]; } catch(e){ delete __MEM[k]; } }
+
+function defaultState(u){
+  return {
+    reads: (u.reads||[]).slice(),
+    follows: (u.favs||[]).map(x=>x.notice_id),
+    blocks: (u.trash||[]).map(x=>x.notice_id),
+    todos: (u.todos||[]).map(t=>({...t}))
+  };
+}
+function loadState(no){
+  const raw = lsGet(LS+no);
+  if(raw){ try{ return JSON.parse(raw); }catch(e){} }
+  return defaultState(DATA.users[no]);
+}
+function saveState(){ if(S.no) lsSet(LS+S.no, JSON.stringify(ST)); }
+
+/* ================== 数据派生 ================== */
+const idx = (id)=>DATA.index[id]||{title:"（通知已移除）",source:"",category:"",publish_time:"",url:"",deadline:"",event_time:"",content:""};
+const full = (it)=>({...idx(it.notice_id), ...it});
+const blocked = (id)=>ST.blocks.includes(id);
+const followed = (id)=>ST.follows.includes(id);
+const isRead = (id)=>ST.reads.includes(id);
+
+function visible(list){ return (list||[]).filter(x=>!blocked(x.notice_id)); }
+function favList(){ return ST.follows.map(id=>({notice_id:id})); }
+function todoOpen(){ return ST.todos.filter(t=>!t.done); }
+
+/* 日历条目：关注的活动（有截止日、未过期）+ 未完成待办 */
+function datedItems(){
+  const out = [];
+  for(const id of ST.follows){
+    const n = idx(id);
+    const left = dayDiff(n.deadline);
+    if(n.deadline && left!==null && left>=0) out.push({kind:"notice", ...n});
+  }
+  for(const t of ST.todos){
+    const left = dayDiff(t.due);
+    if(!t.done && t.due && left!==null && left>=0) out.push({kind:"todo", ...t, deadline:t.due});
+  }
+  return out.sort((a,b)=> (a.deadline||"").localeCompare(b.deadline||""));
+}
+function dueSoon(){
+  return datedItems().filter(x=>{ const l=dayDiff(x.deadline); return l!==null && l>=0 && l<=3; });
+}
+
+/* ================== 渲染：卡片 ================== */
+function chipOf(level){
+  if(level==="重点") return `<span class="chip key">🔥 重点</span>`;
+  if(level==="推荐") return `<span class="chip rec">⭐ 推荐</span>`;
+  return `<span class="chip normal">普通</span>`;
+}
+function noticeCard(it){
+  const n = full(it);
+  const id = n.notice_id;
+  const fav = followed(id), blk = blocked(id), rd = isRead(id);
+  const open = !!S.open[id];
+  const hasBody = (n.content||"").length>60;
+  const meta = [];
+  if(n.source) meta.push(`来源 <b>${esc(n.source)}</b>`);
+  if(n.category) meta.push(`分类 <b>${esc(n.category)}</b>`);
+  if(n.publish_time) meta.push(`发布 ${esc(n.publish_time)}`);
+  if(n.deadline) meta.push(`截止 <b>${esc(n.deadline)}</b>（${dlTag(n.deadline)}）`);
+  if(n.event_time) meta.push(esc(eventLabel(n.event_time)));
+
+  return `<div class="ncard ${rd?"read":""}">
+    <div>${it.score?chipOf(it.level):""} ${(!rd && it.level && it.level!=="普通")?'<span class="chip new">🆕 未读</span>':""}</div>
+    <h4>${esc(n.title)}</h4>
+    <div class="meta">${meta.join("　")}</div>
+    <div class="btns">
+      <button class="btn ${fav?"on":""}" data-act="follow" data-id="${esc(id)}">${fav?"⭐ 已关注":"⭐ 关注"}</button>
+      <button class="btn ${blk?"on":""}" data-act="block" data-id="${esc(id)}">${blk?"🚫 已暂不关注":"🚫 暂不关注"}</button>
+      <button class="btn" data-act="read" data-id="${esc(id)}">${rd?"↩︎ 标未读":"✅ 已读"}</button>
+      ${n.url?`<a class="btn" href="${esc(n.url)}" target="_blank" rel="noopener">🔗 原文</a>`:""}
+      ${hasBody?`<button class="btn ghost" data-act="body" data-id="${esc(id)}">${open?"📄 收起正文":"📄 展开正文"}</button>`:""}
+    </div>
+    ${open?`<div class="body">${esc((n.content||"").slice(0,3000))}</div>`:""}
+  </div>`;
+}
+function emptyBox(text, sub){
+  return `<div class="info">${esc(text)}${sub?`<div style="margin-top:6px;color:#6c86a8;font-size:.84rem">${sub}</div>`:""}</div>`;
+}
+
+/* ================== 渲染：页面 ================== */
+function renderDashboard(){
+  if(S.section){
+    const map = {
+      key: ["### 🔥 重点关注", visible(U.key), "暂无高匹配度的紧急信息"],
+      rec: ["### ⭐ 推荐阅读", visible(U.rec), "暂无相关但不紧急的信息"],
+      all: [`### 📚 最近 ${DATA.window_days} 天的全部动态（共 ${visible(U.all).length} 条）`, visible(U.all), "这段时间没有新的校园信息，一切正常"]
+    };
+    const [title, list, empty] = map[S.section];
+    return `<button class="btn" data-act="back" style="margin-bottom:14px">← 返回总览</button>
+      <h3 class="sec">${title.replace("### ","")}</h3>
+      ${list.length? list.map(noticeCard).join("") : `<div class="info">${empty}</div>`}`;
+  }
+
+  const key = visible(U.key), rec = visible(U.rec), all = visible(U.all);
+  const ds = dueSoon();
+  const dueHtml = ds.length ? ds.map(x=>{
+    const t = x.kind==="todo"
+      ? `📝 ${esc(x.title)} <span class="note">${esc(x.note||"")}</span>`
+      : `${esc(x.title)} <span class="note">${esc(eventLabel(x.event_time))}</span>`;
+    return `<div class="dl-item">${t}<span class="dl-left">${esc(x.deadline)} · ${dlTag(x.deadline)}</span></div>`;
+  }).join("") : `<div class="meta">近 3 天内没有要截止的事，安心～</div>`;
+
+  const tiles = [
+    ["🔥","重点关注",key.length,"条","key"],
+    ["⭐","推荐阅读",rec.length,"条","rec"],
+    ["📚","全部动态",all.length,"条","all"],
+    ["📝","我的待办",todoOpen().length,"项","todos"]
+  ].map(([e,t,c,unit,target])=>`
+    <div class="tile">
+      <div class="tile-count">${c}<span class="tile-unit">${unit}</span></div>
+      <div class="tile-title">${e} ${t}</div>
+      <div class="tile-hint">${c? "👇 点击下方按钮查看全部":"暂时还没有内容"}</div>
+      <button class="tile-btn" data-act="tile" data-target="${target}">查看全部 →</button>
+    </div>`).join("");
+
+  return `
+    <div class="hero">
+      <div class="hero-title">你好，${esc(U.name)} 👋　<em>今天也有值得看的新信息</em></div>
+      <div class="hero-sub">以下是近 ${DATA.window_days} 天学校发布、与你相关的校园信息，点击下方分区卡片查看具体内容</div>
+    </div>
+    <div class="card">
+      <div style="font-weight:800;font-size:1.02rem">⏰ 最近要截止的事</div>
+      <div class="meta" style="margin:4px 0 10px">已关注的校园通知 + 自己填写的待办，在 3 天内（含今天）截止</div>
+      ${dueHtml}
+    </div>
+    <hr class="sep">
+    <div class="tiles">${tiles}</div>`;
+}
+
+function renderCalendar(){
+  const items = datedItems();
+  const first = new Date(S.calY, S.calM-1, 1);
+  const startPad = (first.getDay()+6)%7;                 // 周一为第一列
+  const daysInMonth = new Date(S.calY, S.calM, 0).getDate();
+  const prevDays = new Date(S.calY, S.calM-1, 0).getDate();
+
+  const byDate = {};
+  for(const it of items){
+    const d = it.deadline;
+    if(!d) continue;
+    const y = Number(d.slice(0,4)), m = Number(d.slice(5,7));
+    if(y===S.calY && m===S.calM) (byDate[d] = byDate[d]||[]).push(it);
+  }
+
+  const cells = ["一","二","三","四","五","六","日"].map(w=>`<div class="cal-cell cal-head-cell">${w}<span></span></div>`);
+  for(let i=startPad-1;i>=0;i--) cells.push(`<div class="cal-cell cal-out">${prevDays-i}<span></span></div>`);
+  for(let d=1; d<=daysInMonth; d++){
+    const key = `${S.calY}-${String(S.calM).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    const cnt = (byDate[key]||[]).length;
+    let cls = "cal-cell";
+    if(key===TODAY) cls += " cal-today";
+    else if(cnt) cls += " cal-has";
+    cells.push(`<div class="${cls}">${d}<span>${cnt?cnt+" 项":""}</span></div>`);
+  }
+  const tail = (7 - (startPad+daysInMonth)%7)%7;
+  for(let i=1;i<=tail;i++) cells.push(`<div class="cal-cell cal-out">${i}<span></span></div>`);
+
+  const groups = {};
+  for(const it of items) (groups[it.deadline] = groups[it.deadline]||[]).push(it);
+  const nNotice = items.filter(x=>x.kind==="notice").length;
+  const nTodo = items.length - nNotice;
+
+  const listHtml = items.length ? Object.keys(groups).sort().map(date=>{
+    const rows = groups[date].map(it=> it.kind==="todo"
+      ? `<div class="dl-item">📝 <b>${esc(it.title)}</b><span class="tag">我的待办</span>${it.note?`<span class="note">　${esc(it.note)}</span>`:""}</div>`
+      : `<div class="dl-item"><b>${esc(it.title)}</b><span class="tag">${esc(it.category||"通知")}</span>${it.event_time?`<span class="note">　${esc(eventLabel(it.event_time))}</span>`:""}　${it.url?`<a href="${esc(it.url)}" target="_blank" rel="noopener">原文</a>`:""}</div>`
+    ).join("");
+    return `<div class="dl-group"><div class="dl-date">${date}<span class="dl-left">${dlTag(date)}</span></div>${rows}</div>`;
+  }).join("") : emptyBox("你还没有关注任何「有截止日期」的活动，也没有填写待办。",
+      "· 去首页给关心的事项点「⭐ 关注」，或 · 到「📝 我的待办」填写自己的截止事项");
+
+  return `<h2 class="page-title">📅 截止日历</h2>
+    <div class="page-sub">显示你已关注的活动 + 自己填写的待办，过期事项会自动消失</div>
+    <div class="card">
+      <div class="cal-head">
+        <div class="cal-month">${S.calY} 年 ${S.calM} 月</div>
+        <div class="cal-nav">
+          <button data-act="cal" data-step="-1">‹</button>
+          <button data-act="cal" data-step="1">›</button>
+        </div>
+      </div>
+      <div class="cal-grid">${cells.join("")}</div>
+    </div>
+    <hr class="sep">
+    <h3 class="sec">📌 截止清单（共 ${items.length} 项：关注的 ${nNotice} · 我的待办 ${nTodo}）</h3>
+    ${listHtml}`;
+}
+
+function renderTodos(){
+  const groups = {over:[], soon:[], rest:[], done:[]};
+  for(const t of ST.todos){
+    if(t.done){ groups.done.push(t); continue; }
+    const l = dayDiff(t.due);
+    if(l===null){ groups.rest.push(t); }
+    else if(l<0) groups.over.push(t);
+    else if(l<=3) groups.soon.push(t);
+    else groups.rest.push(t);
+  }
+  const row = (t)=>`<div class="todo ${t.done?"done":""}">
+      <button class="icon" data-act="todo-done" data-id="${esc(t.id)}" title="${t.done?"标为未完成":"完成"}">${t.done?"✅":"⬜"}</button>
+      <div class="t-title">${esc(t.title)}${t.note?`<div class="note">${esc(t.note)}</div>`:""}</div>
+      <div class="t-due">${t.due?`${esc(t.due)}${t.done?"":` · ${dlTag(t.due)}`}`:"未设日期"}</div>
+      <button class="icon" data-act="todo-del" data-id="${esc(t.id)}" title="删除">🗑️</button>
+    </div>`;
+  const sec = (title, arr)=> arr.length ? `<div class="grp">${title}（${arr.length}）</div>${arr.map(row).join("")}` : "";
+
+  return `<h2 class="page-title">📝 我的待办</h2>
+    <div class="page-sub">填写自己的截止事项（交作业、报名、交材料…），会自动同步到「📅 截止日历」和首页「⏰ 最近要截止的事」</div>
+    <div class="card">
+      <div style="font-weight:800;margin-bottom:12px">➕ 新增待办</div>
+      <div class="form">
+        <div><label class="f">事项名称</label><input type="text" id="td-title" placeholder="例如：提交课程论文 / 报名四六级"></div>
+        <div><label class="f">截止日期</label><input type="date" id="td-due" value="${futureDate(3)}"></div>
+        <div class="full"><label class="f">备注（可选）</label><input type="text" id="td-note" placeholder="例如：需导师签字，带纸质版"></div>
+        <div class="full"><button class="primary" data-act="todo-add">添加待办</button></div>
+      </div>
+    </div>
+    <div class="card">
+      ${sec("🔴 已逾期", groups.over)}
+      ${sec("🟠 3 天内", groups.soon)}
+      ${sec("📌 其他", groups.rest)}
+      ${groups.done.length?`<div class="grp">✅ 已完成（${groups.done.length}）</div>${groups.done.map(row).join("")}`:""}
+      ${(!ST.todos.length)?emptyBox("还没有待办，上面填写一条试试"):""}
+    </div>`;
+}
+
+function renderFavorites(){
+  const items = favList();
+  if(!items.length) return `<h2 class="page-title">⭐ 我的关注</h2>
+    <div class="page-sub">你关注的活动都会在这里，系统会持续追踪它们的后续通知并提醒截止</div>
+    ${emptyBox("还没有关注任何通知。","在首页卡片上点「⭐ 关注」即可加入这里。")}`;
+
+  const cards = items.map(noticeCard).join("");
+  return `<h2 class="page-title">⭐ 我的关注</h2>
+    <div class="page-sub">你关注的活动都会在这里，系统会持续追踪它们的后续通知并提醒截止</div>
+    <div style="margin:6px 0 2px;color:var(--muted);font-size:.9rem">共 <b>${items.length}</b> 个关注</div>
+    <hr class="sep">${cards}`;
+}
+
+function renderTrash(){
+  const ids = ST.blocks;
+  if(!ids.length) return `<h2 class="page-title">🗑️ 回收箱</h2>
+    <div class="page-sub">你暂不关注的通知都在这里，随时可以恢复关注</div>
+    ${emptyBox("回收箱是空的。","在卡片上点「🚫 暂不关注」的通知会进到这里。")}`;
+  const rows = ids.map(id=>{
+    const n = idx(id);
+    return `<div class="ncard">
+      <h4>${esc(n.title)}</h4>
+      <div class="meta">来源 <b>${esc(n.source||"-")}</b>　发布 ${esc(n.publish_time||"-")}</div>
+      <div class="btns">
+        <button class="btn" data-act="restore" data-id="${esc(id)}">♻️ 恢复关注</button>
+        <button class="btn" data-act="purge" data-id="${esc(id)}">🗑️ 彻底移除</button>
+        ${n.url?`<a class="btn" href="${esc(n.url)}" target="_blank" rel="noopener">🔗 原文</a>`:""}
+      </div></div>`;
+  }).join("");
+  return `<h2 class="page-title">🗑️ 回收箱</h2>
+    <div class="page-sub">你暂不关注的通知都在这里，随时可以恢复关注</div>
+    <div style="margin:6px 0 2px;color:var(--muted);font-size:.9rem">共 <b>${ids.length}</b> 条暂不关注</div>
+    <hr class="sep">${rows}`;
+}
+
+function renderProfile(){
+  const rows = [
+    ["姓名", U.name], ["学号", U.student_no], ["身份", U.identity], ["年级", U.grade],
+    ["阶段", U.stage], ["学院", U.college], ["专业", U.major], ["专业方向", U.major_dir],
+    ["关注方向", (U.interests||[]).join("、")], ["目标", (U.goal||[]).join("、")],
+    ["偏好", (U.preferences||[]).join("、")], ["自定义关键词", (U.custom_keywords||[]).join("、")]
+  ].filter(r=>r[1]);
+  return `<h2 class="page-title">👤 用户中心</h2>
+    <div class="page-sub">这是生成页面时你的画像，AI 就是按它给每条通知打分的</div>
+    <div class="card">
+      ${rows.map(([k,v])=>`<div class="todo" style="border-bottom:1px dashed #eef2f8">
+        <div class="t-title" style="flex:0 0 118px;color:#5b7089;font-weight:600">${esc(k)}</div>
+        <div style="flex:1">${esc(v)}</div></div>`).join("")}
+    </div>
+    <div class="warn">⚠️ 静态版不支持修改画像：这里的数据是生成页面那一刻的快照。想改画像，请在 <b>http://127.0.0.1:8503</b> 的「用户中心」修改，改完会重新用大模型匹配，我再重新生成这个页面。</div>`;
+}
+
+/* ================== 路由 ================== */
+const PAGES = {
+  dashboard: renderDashboard, calendar: renderCalendar, todos: renderTodos,
+  favorites: renderFavorites, trash: renderTrash, profile: renderProfile
+};
+const NAVS = [
+  ["dashboard","🏠","首页"], ["calendar","📅","截止日历"], ["todos","📝","我的待办"],
+  ["favorites","⭐","我的关注"], ["trash","🗑️","回收箱"], ["profile","👤","用户中心"]
+];
+
+function futureDate(n){
+  const d = new Date(TODAY+"T00:00:00"); d.setDate(d.getDate()+n);
+  return d.toISOString().slice(0,10);
+}
+
+function renderSidebar(){
+  $("#who").innerHTML = `<b>${esc(U.name)}</b> · ${esc(U.identity||"")}<br>${esc(U.college||"")}`;
+  $("#gen").innerHTML = `数据更新于 ${esc(DATA.generated_at)}<br>近 ${DATA.window_days} 天 · 共 ${Object.keys(DATA.index).length} 条通知`;
+  $("#nav").innerHTML = NAVS.map(([k,e,t])=>
+    `<button data-act="nav" data-page="${k}" class="${S.page===k?"on":""}">${e} ${t}</button>`).join("");
+}
+
+function render(){
+  if(!S.no){ renderLogin(); return; }
+  $("#side").style.display = "";
+  renderSidebar();
+  $("#main").innerHTML = PAGES[S.page]();
+  window.scrollTo({top:0,behavior:"instant"});
+}
+
+function renderLogin(){
+  const accounts = Object.values(DATA.users);
+  $("#side").style.display = "none";
+  $("#main").innerHTML = `<div class="login-wrap">
+    <div class="login-card">
+      <h1>🎓 校园 AI 信息助手</h1>
+      <p class="sub">对外经济贸易大学 · 演示版（单文件 HTML）</p>
+      <div class="field"><label class="f">学号</label><input type="text" id="lg-no" placeholder="请输入学号"></div>
+      <div class="field"><label class="f">密码</label><input type="password" id="lg-pw" value="123456"></div>
+      <button class="primary" style="width:100%" data-act="login">进入</button>
+      <div class="err" id="lg-err"></div>
+      <div class="quick">
+        ${accounts.map(a=>`<button data-act="quick" data-no="${esc(a.student_no)}">${esc(a.name)} · ${esc(a.student_no)}</button>`).join("")}
+      </div>
+      <div class="demo-tip">演示密码统一为 <b>123456</b>，点上面的账号可直接进入。<br>
+      本页是离线快照，关注 / 待办等操作保存在你自己的浏览器里。</div>
+    </div>
+  </div>`;
+}
+
+/* ================== 动作 ================== */
+function loginAs(no){
+  if(!DATA.users[no]) return;
+  S.no = no; U = DATA.users[no]; ST = loadState(no);
+  S.page = "dashboard"; S.section = null; S.open = {};
+  lsSet(LS+"last", no);
+  render(); saveState();
+}
+
+document.addEventListener("click", (e)=>{
+  const el = e.target.closest("[data-act]");
+  if(!el) return;
+  const act = el.dataset.act, id = el.dataset.id;
+
+  if(act==="login"){
+    const no = ($("#lg-no").value||"").trim();
+    const pw = ($("#lg-pw").value||"").trim();
+    if(!DATA.users[no]){ $("#lg-err").textContent = "学号不存在（可点下方演示账号）"; return; }
+    if(pw!=="123456"){ $("#lg-err").textContent = "演示密码为 123456"; return; }
+    loginAs(no); return;
+  }
+  if(act==="quick"){ loginAs(el.dataset.no); return; }
+  if(act==="logout"){
+    lsDel(LS+"last");
+    S.no=null; U=null; ST=null; S.page="dashboard"; S.section=null; render(); return;
+  }
+  if(act==="nav"){
+    S.page = el.dataset.page; S.section = null; render(); return;
+  }
+  if(act==="tile"){
+    const t = el.dataset.target;
+    if(t==="todos"){ S.page="todos"; S.section=null; } else { S.section = t; S.page="dashboard"; }
+    render(); return;
+  }
+  if(act==="back"){ S.section=null; render(); return; }
+
+  if(act==="follow"){
+    if(followed(id)){ ST.follows = ST.follows.filter(x=>x!==id); }
+    else{
+      ST.follows.push(id);
+      ST.blocks = ST.blocks.filter(x=>x!==id);
+    }
+    saveState(); render(); return;
+  }
+  if(act==="block"){
+    if(blocked(id)){ ST.blocks = ST.blocks.filter(x=>x!==id); }
+    else{
+      ST.blocks.push(id);
+      ST.follows = ST.follows.filter(x=>x!==id);
+    }
+    saveState(); render(); return;
+  }
+  if(act==="read"){
+    ST.reads = isRead(id) ? ST.reads.filter(x=>x!==id) : ST.reads.concat([id]);
+    saveState(); render(); return;
+  }
+  if(act==="body"){ S.open[id] = !S.open[id]; render(); return; }
+
+  if(act==="restore"){
+    ST.blocks = ST.blocks.filter(x=>x!==id);
+    if(!followed(id)) ST.follows.push(id);
+    saveState(); render(); return;
+  }
+  if(act==="purge"){ ST.blocks = ST.blocks.filter(x=>x!==id); saveState(); render(); return; }
+
+  if(act==="cal"){
+    let m = S.calM + Number(el.dataset.step), y = S.calY;
+    if(m<1){ m=12; y--; } if(m>12){ m=1; y++; }
+    S.calM=m; S.calY=y; render(); return;
+  }
+
+  if(act==="todo-add"){
+    const title = ($("#td-title").value||"").trim();
+    if(!title){ $("#td-title").focus(); return; }
+    ST.todos.push({
+      id: "t"+Date.now(),
+      title,
+      due: ($("#td-due").value||"").trim(),
+      note: ($("#td-note").value||"").trim(),
+      done:false
+    });
+    saveState(); render(); return;
+  }
+  if(act==="todo-done"){
+    const t = ST.todos.find(x=>x.id===id); if(t){ t.done=!t.done; saveState(); render(); }
+    return;
+  }
+  if(act==="todo-del"){
+    ST.todos = ST.todos.filter(x=>x.id!==id); saveState(); render(); return;
+  }
+});
+
+/* 回车登录 */
+document.addEventListener("keydown", (e)=>{
+  if(e.key==="Enter" && e.target && (e.target.id==="lg-no"||e.target.id==="lg-pw")){
+    const b = document.querySelector('[data-act="login"]'); if(b) b.click();
+  }
+});
+
+/* 启动：支持 ?u=学号&p=页面 直达（也可记住上次登录的账号） */
+window.addEventListener("error", function(ev){
+  var box = document.getElementById("boot-error");
+  if(box) return;
+  box = document.createElement("div");
+  box.id = "boot-error";
+  box.style.cssText = "position:fixed;left:16px;right:16px;bottom:16px;z-index:9999;background:#fff3f3;"
+    + "border:1px solid #f0c2c2;color:#8a2b2b;border-radius:12px;padding:12px 14px;"
+    + "font:13px/1.6 -apple-system,BlinkMacSystemFont,'Microsoft YaHei',sans-serif;"
+    + "box-shadow:0 8px 24px rgba(0,0,0,.12)";
+  box.innerHTML = "<b>页面脚本执行出错</b><br>如果页面空白，请用 Chrome / Edge / Safari 浏览器打开本文件，"
+    + "不要在微信、QQ 里直接预览。<br><span style='color:#a06a6a'>" + (ev.message||"") + "</span>";
+  document.body.appendChild(box);
+});
+
+(function boot(){
+  try {
+    const q = new URLSearchParams(location.search);
+    render();
+    const qu = q.get("u");
+    const last = lsGet(LS+"last");
+    if(qu && DATA.users[qu]) loginAs(qu);
+    else if(last && DATA.users[last]) loginAs(last);
+    const qp = q.get("p");
+    if(S.no && qp && PAGES[qp]){ S.page = qp; S.section = null; render(); }
+  } catch(e){
+    document.getElementById("main").innerHTML =
+      "<div class='card'><h3 class='sec'>页面加载失败</h3><p>请改用 Chrome / Edge / Safari 打开本文件。"
+      + "<br><span style='color:#8a2b2b'>" + (e && e.message ? e.message : e) + "</span></p></div>";
+  }
+})();
+</script>
+</body>
+</html>
